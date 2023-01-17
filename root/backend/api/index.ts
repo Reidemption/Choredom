@@ -7,6 +7,8 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 
+import { choresRouter } from "../chores/chores.router";
+
 dotenv.config();
 
 /**
@@ -28,6 +30,7 @@ const app = express();
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+app.use("/api/chores/items", choresRouter);
 
 /**
  * Server Activation
