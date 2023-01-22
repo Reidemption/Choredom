@@ -3,8 +3,8 @@ export interface BaseChore {
   due_date: string;
   description: string;
   repeated: boolean;
-  frequency: string | null;
-  room_area: string;
+  frequency?: string | null;
+  room_area?: string | null;
   completed: boolean;
 }
 

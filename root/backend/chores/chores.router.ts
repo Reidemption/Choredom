@@ -2,6 +2,8 @@ import express, { Request, Response } from "express";
 import * as ChoreService from "./chores.service";
 import { BaseChore, Chore } from "./chore.interface";
 
+import { checkJwt } from "../middleware/authz.middleware";
+
 export const choresRouter = express.Router();
 
 choresRouter.get("/", async (req: Request, res: Response) => {
@@ -29,6 +31,8 @@ choresRouter.get("/:id", async (req: Request, res: Response) => {
     res.status(500).send(err.message);
   }
 });
+
+choresRouter.use(checkJwt);
 
 choresRouter.post("/", async (req: Request, res: Response) => {
   try {

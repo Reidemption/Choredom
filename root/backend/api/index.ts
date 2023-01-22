@@ -8,6 +8,8 @@ import cors from "cors";
 import helmet from "helmet";
 
 import { choresRouter } from "../chores/chores.router";
+import { errorHandler } from "../middleware/error.middleware";
+import { notFoundHandler } from "../middleware/not-found.middleware";
 
 dotenv.config();
 
@@ -31,6 +33,9 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use("/api/chores/items", choresRouter);
+
+app.use(errorHandler);
+app.use(notFoundHandler);
 
 /**
  * Server Activation
