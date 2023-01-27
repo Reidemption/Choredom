@@ -5,4 +5,8 @@ Hoping to create web project where users can upload their chore list and will re
 
 https://auth0.com/blog/node-js-and-typescript-tutorial-secure-an-express-api/#Register-a-Client-Application-with-Auth0
 
+https://dev.to/osiroski/backend-nodejs-mongodb-express-typescript-431i
+
 # Frontend:
+
+https://whimsical.com/4600-project-choredom-GtwNfFcryFRKMJT8hAhvxd
