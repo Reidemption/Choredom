@@ -10,3 +10,5 @@ https://dev.to/osiroski/backend-nodejs-mongodb-express-typescript-431i
 # Frontend:
 
 https://whimsical.com/4600-project-choredom-GtwNfFcryFRKMJT8hAhvxd
+
+https://undraw.co/illustrations
