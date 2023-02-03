@@ -8,7 +8,7 @@ const colors = {
   styles: {
     global: () => ({
       body: {
-        bg: "blue.800",
+        bg: "#94A1B2",
       },
     }),
   },

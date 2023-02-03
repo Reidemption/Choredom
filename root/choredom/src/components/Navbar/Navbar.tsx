@@ -14,6 +14,7 @@ import {
   BoxProps,
   FlexProps,
   Divider,
+  Spacer,
 } from "@chakra-ui/react";
 import {
   FiHome,
@@ -23,18 +24,19 @@ import {
   FiSettings,
   FiMenu,
 } from "react-icons/fi";
+import NextLink from "next/link";
 import { IconType } from "react-icons";
 
 interface LinkItemProps {
   name: string;
   icon: IconType;
+  link: string;
 }
 const LinkItems: Array<LinkItemProps> = [
-  { name: "Your Chores", icon: FiHome },
-  { name: "Social Feed", icon: FiCompass },
-  { name: "All Chores", icon: FiTrendingUp },
-  { name: "Add Chore", icon: FiStar },
-  { name: "Account Info", icon: FiSettings },
+  { name: "Your Chores", icon: FiHome, link: "/home" },
+  { name: "Social Feed", icon: FiCompass, link: "/social" },
+  { name: "All Chores", icon: FiTrendingUp, link: "/" },
+  { name: "Add Chore", icon: FiStar, link: "/newchore" },
 ];
 
 export default function SimpleSidebar({ children }: { children: ReactNode }) {
@@ -73,7 +75,7 @@ interface SidebarProps extends BoxProps {
 
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   return (
-    <Box
+    <Flex
       bg={useColorModeValue("white", "gray.900")}
       borderRight="1px"
       borderRightColor={useColorModeValue("gray.200", "gray.700")}
@@ -81,31 +83,39 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       pos="fixed"
       h="full"
       {...rest}
+      direction="column"
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
         <Text fontSize="2xl" fontWeight="bold">
-          Choredom
+          <Link href="/" style={{ textDecoration: "none" }}>
+            Choredom
+          </Link>
         </Text>
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Flex>
       {LinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon}>
+        <NavItem key={link.name} icon={link.icon} url={link.link}>
           {link.name}
         </NavItem>
       ))}
-      <Divider size="20px" colorScheme="gray" />
-      <Flex></Flex>
-    </Box>
+      <Divider />
+      <Spacer />
+      <NavItem icon={FiSettings} url="accountInfo">
+        My Account
+      </NavItem>
+    </Flex>
   );
 };
 
 interface NavItemProps extends FlexProps {
   icon: IconType;
+  url: string;
 }
-const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
+const NavItem = ({ icon, url, children, ...rest }: NavItemProps) => {
   return (
     <Link
-      href="/login"
+      as={NextLink}
+      href={url}
       style={{ textDecoration: "none" }}
       _focus={{ boxShadow: "none" }}
     >
@@ -162,7 +172,9 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       />
 
       <Text fontSize="2xl" ml="8" fontFamily="monospace" fontWeight="bold">
-        Logo
+        <Link href="/" style={{ textDecoration: "none" }}>
+          Choredom
+        </Link>
       </Text>
     </Flex>
   );

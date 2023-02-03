@@ -14,9 +14,7 @@ import {
   HStack,
 } from "@chakra-ui/react";
 import React from "react";
-import { Inter } from "@next/font/google";
-
-const inter = Inter({ subsets: ["latin"] });
+import { useRouter } from "next/router";
 
 function PasswordInput() {
   const [show, setShow] = React.useState(false);
@@ -48,6 +46,8 @@ function CreateUser() {
 const noAccount = "Don't have an account?";
 
 export default function Home() {
+  const router = useRouter();
+
   return (
     <div>
       <Flex>
@@ -77,9 +77,10 @@ export default function Home() {
               <h4>{noAccount}</h4>
               <Button
                 colorScheme="purple"
-                onClick={CreateUser}
+                onClick={() => router.push("/register")}
                 variant="outline"
               >
+                <a href=""></a>
                 Sign Up
               </Button>
             </Stack>
