@@ -12,3 +12,5 @@ https://dev.to/osiroski/backend-nodejs-mongodb-express-typescript-431i
 https://whimsical.com/4600-project-choredom-GtwNfFcryFRKMJT8hAhvxd
 
 https://undraw.co/illustrations
+
+https://www.youtube.com/watch?v=PKwu15ldZ7k
