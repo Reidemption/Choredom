@@ -1,22 +1,19 @@
 import { extendTheme } from "@chakra-ui/react";
 
-const colors = {
-  brand: {
-    100: "#011627", // darkblue color
-    900: "#FDFFFC", // white color
+export const theme = extendTheme({
+  colors: {
+    brand: {
+      100: "#FF3C00",
+    },
+  },
+  fonts: {
+    body: "Open Sans, sans-serif",
   },
   styles: {
     global: () => ({
       body: {
-        bg: "#94A1B2",
+        bg: "gray.200",
       },
     }),
   },
-  components: {
-    // Button: {
-  },
-};
-
-const theme = extendTheme({ colors });
-
-export default theme;
+});
