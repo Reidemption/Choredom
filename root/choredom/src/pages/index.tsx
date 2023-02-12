@@ -17,9 +17,13 @@ import {
   FormErrorMessage,
   FormHelperText,
   Link,
+  ButtonGroup,
 } from "@chakra-ui/react";
 import React, { useRef } from "react";
-import { useRouter } from "next/router";
+import { Router, useRouter } from "next/router";
+import { auth } from "../firebase/clientApp";
+import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { FIREBASE_ERRORS } from "../firebase/errors";
 
 function PasswordInput() {
   const [show, setShow] = React.useState(false);
@@ -44,52 +48,95 @@ function LogInUser() {
   console.log("User logged in");
 }
 
-function CreateUser() {
-  console.log("User created");
-}
-
 const noAccount = "Don't have an account?";
 
 export default function Home() {
-  const emailRef = useRef<HTMLDivElement>(null);
-  const passwordRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const [show, setShow] = React.useState(false);
+  const handleClick = () => setShow(!show);
+
+  const [signInWithEmailAndPassword, user, loading, error] =
+    useSignInWithEmailAndPassword(auth);
+
+  const [loginForm, setLoginForm] = React.useState({
+    email: "",
+    password: "",
+  });
+
+  // Firebase Logic next
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    signInWithEmailAndPassword(loginForm.email, loginForm.password);
+
+    if (!error) {
+      router.push("/home");
+    }
+  };
+
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLoginForm((prev) => ({
+      ...prev,
+      [event.target.name]: event.target.value,
+    }));
+  };
 
   return (
-    <div>
-      <Flex align={"center"} justify={"center"}>
-        <Center w={{ base: "50%", md: "100%" }}>
-          <Stack align="center" justify="center">
-            <Text fontSize="5xl">Choredom</Text>
-            <Image
-              w={{ base: "50%", md: "500px" }}
-              h={{ base: "50%", md: "500px" }}
-              src="/chore_list.svg"
-              alt="Man showing off his chores list"
-            />
-          </Stack>
-        </Center>
-        <Spacer />
-        <Center w={{ base: "50%", md: "100%" }}>
-          <Box rounded={"lg"} boxShadow={"lg"} p={8} bg={"white"}>
-            <Stack spacing={4}>
-              <FormControl id="email">
-                <FormLabel>Email address</FormLabel>
-                <Input type="email" />
-              </FormControl>
-              <FormControl id="password">
-                <FormLabel>Password</FormLabel>
-                <Input type="password" />
-              </FormControl>
-              <Stack spacing={10}>
-                <Stack
-                  direction={{ base: "column", sm: "row" }}
-                  align={"start"}
-                  justify={"space-between"}
-                >
-                  <Link color={"blue.400"}>Forgot password?</Link>
-                </Stack>
+    <Flex align={"center"} justify={"center"} w={"175vh"}>
+      <Center w={{ base: "50%", md: "100%" }}>
+        <Stack align="center" justify="center">
+          <Text fontSize="5xl">Choredom</Text>
+          <Image
+            w={{ base: "50%", md: "500px" }}
+            h={{ base: "50%", md: "500px" }}
+            src="/chore_list.svg"
+            alt="Man showing off his chores list"
+          />
+        </Stack>
+      </Center>
+      <Spacer />
+      <Center w={{ base: "50%", md: "100%" }}>
+        <Box rounded={"lg"} boxShadow={"lg"} p={8} bg={"white"}>
+          <Stack spacing={4}>
+            <form id="signIn" onSubmit={onSubmit}>
+              <FormLabel>Email address</FormLabel>
+              <Input
+                required
+                id="email"
+                type="email"
+                name="email"
+                onChange={onChange}
+              />
+              <FormErrorMessage>Email is required.</FormErrorMessage>
+              <FormLabel mt="3">Password</FormLabel>
+              <InputGroup size="md">
+                <Input
+                  required
+                  id="password"
+                  name="password"
+                  onChange={onChange}
+                  pr="4.5rem"
+                  type={show ? "text" : "password"}
+                />
+                <InputRightElement width="4.5rem">
+                  <Button h="1.75rem" size="sm" onClick={handleClick}>
+                    {show ? "Hide" : "Show"}
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
+              <FormErrorMessage>Password is required.</FormErrorMessage>
+              <Stack spacing={5}>
+                <Link color={"blue.400"}>Forgot password?</Link>
+                <Text textAlign={"center"} color="red.500">
+                  {
+                    FIREBASE_ERRORS[
+                      error?.message as keyof typeof FIREBASE_ERRORS
+                    ]
+                  }
+                </Text>
                 <Button
+                  isLoading={loading}
+                  type="submit"
                   colorScheme="purple"
                   variant="outline"
                   _hover={{
@@ -99,20 +146,22 @@ export default function Home() {
                 >
                   Sign in
                 </Button>
+                <Divider />
                 <Button
                   colorScheme="purple"
                   _hover={{
                     bg: "purple",
                     color: "white",
                   }}
+                  onClick={() => router.push("/register")}
                 >
-                  Create Account
+                  <Link href="/register">Create Account</Link>
                 </Button>
               </Stack>
-            </Stack>
-          </Box>
-        </Center>
-      </Flex>
-    </div>
+            </form>
+          </Stack>
+        </Box>
+      </Center>
+    </Flex>
   );
 }
