@@ -5,9 +5,12 @@ import { auth } from "../firebase/clientApp";
 import { FIREBASE_ERRORS } from "../firebase/errors";
 import InputItem from "../components/InputItem";
 
-type loginProps = {};
+// TODO: Eventually I plan on making the app route to this page if the user is not logged in.
+// When that happens I'll copy everything from index.tsx and paste it here. and make index the main page.
 
-const Login: React.FC<LoginProps> = ({ toggleView }) => {
+type LoginProps = {};
+
+const Login: React.FC<LoginProps> = () => {
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -70,23 +73,13 @@ const Login: React.FC<LoginProps> = ({ toggleView }) => {
         <Text fontSize="9pt" mr={1}>
           Forgot your password?
         </Text>
-        <Text
-          fontSize="9pt"
-          color="blue.500"
-          cursor="pointer"
-          onClick={() => toggleView("resetPassword")}
-        >
+        <Text fontSize="9pt" color="blue.500" cursor="pointer">
           Reset
         </Text>
       </Flex>
       <Flex fontSize="9pt" justifyContent="center">
         <Text mr={1}>New here?</Text>
-        <Text
-          color="blue.500"
-          fontWeight={700}
-          cursor="pointer"
-          onClick={() => toggleView("signup")}
-        >
+        <Text color="blue.500" fontWeight={700} cursor="pointer">
           SIGN UP
         </Text>
       </Flex>
