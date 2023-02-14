@@ -1,6 +1,14 @@
 import React from "react";
 
-import { Box, Flex, Image } from "@chakra-ui/react";
+import {
+  Box,
+  Center,
+  Flex,
+  Image,
+  Spacer,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 
 interface SocialTileProps {
   image?: string;
@@ -12,25 +20,34 @@ interface SocialTileProps {
 
 const SocialTile: React.FC<SocialTileProps> = (props) => {
   return (
-    <Box borderWidth="1px" borderRadius="lg">
-      <Image src={props.image} alt={props.imageAlt} p={10} />
-      <Flex>
-        <Box p="6">
-          {props.choreTitle}
-          <Box display="flex" alignItems="baseline">
-            <Box
-              color="gray.500"
-              fontWeight="semibold"
-              letterSpacing="wide"
-              fontSize="xs"
-              ml="2"
-            >
-              {props.finishedDate}
-            </Box>
-          </Box>
+    <Flex
+      m={5}
+      align="center"
+      justify="center"
+      border={"1px"}
+      borderColor={"blackAlpha.400"}
+      maxWidth={600}
+    >
+      <Center>
+        <Image src={props.image} alt={props.imageAlt} p={10} w={400} h={300} />
+      </Center>
+      <Spacer />
+      <VStack align="center" justify="center" spacing={1} pr={5} maxW={200}>
+        <Text textAlign={"center"}>{props.choreTitle}</Text>
+        <Box
+          color="gray.500"
+          fontWeight="semibold"
+          letterSpacing="wide"
+          fontSize="xs"
+          ml="2"
+        >
+          {props.finishedDate}
         </Box>
-      </Flex>
-    </Box>
+        <Text textAlign={"center"} fontSize={"xs"} w={125}>
+          {props.choreStory}
+        </Text>
+      </VStack>
+    </Flex>
   );
 };
 
