@@ -10,11 +10,11 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useSetRecoilState } from "recoil";
-// import { authState } from "../../atoms/authState";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../firebase/clientApp";
 import { signOut } from "firebase/auth";
 import UserNav from "./UserNav";
+import Link from "next/link";
 interface LayoutProps {
   children?: ReactNode;
   // any props that come into the component
@@ -41,26 +41,33 @@ const Layout: React.FC = ({ children }: LayoutProps) => {
             pt={"4"}
           >
             <Box>
-              <Text fontSize={"3xl"}>Choredom</Text>
+              <Text fontSize={"3xl"}>
+                <Link href="/home">Choredom</Link>
+              </Text>
             </Box>
             <Box>
-              <h2>Your Chores</h2>
+              <Text>
+                <Link href="/feed">Your Chores</Link>
+              </Text>
             </Box>
             <Box>
-              <h2>Social Feed</h2>
+              <Text>
+                <Link href="/feed/social">Social Feed</Link>
+              </Text>
             </Box>
             <Box>
-              <h2>All Chores</h2>
+              <Text>
+                <Link href="/newchore">Add Chore</Link>
+              </Text>
             </Box>
-            <Box>
-              <h2>Add Chore</h2>
-            </Box>
-            <Box>
-              <h2>My Account</h2>
-            </Box>
+
             <Divider />
             <Spacer />
-
+            <Box>
+              <Text>
+                <Link href="/myaccount">My Account</Link>
+              </Text>
+            </Box>
             <UserNav user={user} />
             <Divider />
             <Box pb={"4"}>
