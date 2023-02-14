@@ -19,36 +19,12 @@ import {
   Link,
   ButtonGroup,
 } from "@chakra-ui/react";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Router, useRouter } from "next/router";
 import { auth } from "../firebase/clientApp";
 import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { FIREBASE_ERRORS } from "../firebase/errors";
-
-function PasswordInput() {
-  const [show, setShow] = React.useState(false);
-  const handleClick = () => setShow(!show);
-  return (
-    <InputGroup size="md">
-      <Input
-        pr="4.5rem"
-        type={show ? "text" : "password"}
-        placeholder="Enter password"
-      />
-      <InputRightElement width="4.5rem">
-        <Button h="1.75rem" size="sm" onClick={handleClick}>
-          {show ? "Hide" : "Show"}
-        </Button>
-      </InputRightElement>
-    </InputGroup>
-  );
-}
-
-function LogInUser() {
-  console.log("User logged in");
-}
-
-const noAccount = "Don't have an account?";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 export default function Home() {
   const router = useRouter();
@@ -57,6 +33,14 @@ export default function Home() {
 
   const [signInWithEmailAndPassword, user, loading, error] =
     useSignInWithEmailAndPassword(auth);
+
+  const [validUser, loadingUser, errorAuth] = useAuthState(auth);
+
+  useEffect(() => {
+    if (validUser) {
+      router.push("/home");
+    }
+  }, [validUser]);
 
   const [loginForm, setLoginForm] = React.useState({
     email: "",
