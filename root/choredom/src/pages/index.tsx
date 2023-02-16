@@ -38,7 +38,7 @@ export default function Home() {
 
   useEffect(() => {
     if (validUser) {
-      router.push("/home");
+      router.push("/chores");
     }
   }, [validUser]);
 
@@ -54,7 +54,7 @@ export default function Home() {
     signInWithEmailAndPassword(loginForm.email, loginForm.password);
 
     if (!error) {
-      router.push("/home");
+      router.push("/chores");
     }
   };
 
