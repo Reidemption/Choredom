@@ -9,14 +9,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-
-interface SocialTileProps {
-  image?: string;
-  imageAlt?: string;
-  finishedDate: string;
-  choreTitle: string;
-  choreStory?: string;
-}
+import SocialTileProps from "../interfaces/SocialTileInterface";
 
 const SocialTile: React.FC<SocialTileProps> = (props) => {
   return (
@@ -27,9 +20,18 @@ const SocialTile: React.FC<SocialTileProps> = (props) => {
       border={"1px"}
       borderColor={"blackAlpha.400"}
       maxWidth={600}
+      minH={300}
     >
       <Center>
-        <Image src={props.image} alt={props.imageAlt} p={10} w={400} h={300} />
+        {props.image && (
+          <Image
+            src={props.image}
+            alt={props.imageAlt}
+            p={10}
+            w={400}
+            h={300}
+          />
+        )}
       </Center>
       <Spacer />
       <VStack align="center" justify="center" spacing={1} pr={5} maxW={200}>

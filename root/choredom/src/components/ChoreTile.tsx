@@ -10,13 +10,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import React from "react";
-
-interface ChoreTileProps {
-  toDoDate: string;
-  choreName: string;
-  choreDescription?: string;
-  choreFrequency?: string;
-}
+import ChoreTileProps from "../interfaces/ChoreTileInterface";
 
 const ChoreTile: React.FC<ChoreTileProps> = (props) => {
   return (
