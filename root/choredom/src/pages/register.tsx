@@ -68,7 +68,7 @@ const SignUp: React.FC = () => {
     createUserWithEmailAndPassword(signUpForm.email, signUpForm.password);
 
     if (!error) {
-      router.push("/home");
+      router.push("/chores");
     }
   };
 
