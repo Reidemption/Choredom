@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, ReactText } from "react";
 import {
   IconButton,
   Box,
@@ -23,20 +23,22 @@ import {
   FiStar,
   FiSettings,
   FiMenu,
+  FiUser,
 } from "react-icons/fi";
 import { IconType } from "react-icons";
-import { ReactText } from "react";
+import VerticallyCenter from "./ChoreModal";
+import { BsFillPersonPlusFill } from "react-icons/bs";
+import { IoPerson } from "react-icons/io5";
 
 interface LinkItemProps {
   name: string;
   icon: IconType;
+  link?: string;
 }
 const LinkItems: Array<LinkItemProps> = [
-  { name: "Home", icon: FiHome },
-  { name: "Trending", icon: FiTrendingUp },
-  { name: "Explore", icon: FiCompass },
-  { name: "Favourites", icon: FiStar },
-  { name: "Settings", icon: FiSettings },
+  { name: "Chores", icon: IoPerson, link: "/chores" },
+  { name: "Social Feed", icon: FiTrendingUp, link: "/social" },
+  { name: "Connect", icon: BsFillPersonPlusFill, link: "/connect" },
 ];
 
 export default function SimpleSidebar({ children }: { children: ReactNode }) {
@@ -91,10 +93,11 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Flex>
       {LinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon}>
+        <NavItem key={link.name} icon={link.icon} link={link.link}>
           {link.name}
         </NavItem>
       ))}
+      <VerticallyCenter />
       <Divider pt={3} w="90%" />
       <Spacer />
       <Flex
@@ -132,7 +135,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         }}
       >
         <Link
-          href="#"
+          href="/myaccount"
           style={{ textDecoration: "none" }}
           _focus={{ boxShadow: "none" }}
         >
@@ -142,9 +145,9 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
             _groupHover={{
               color: "white",
             }}
-            as={FiSettings}
+            as={FiUser}
           />
-          Admin
+          My Account
         </Link>
       </Flex>
     </Box>
@@ -154,11 +157,12 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 interface NavItemProps extends FlexProps {
   icon: IconType;
   children: ReactText;
+  link?: string;
 }
-const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
+const NavItem = ({ icon, children, link, ...rest }: NavItemProps) => {
   return (
     <Link
-      href="#"
+      href={link}
       style={{ textDecoration: "none" }}
       _focus={{ boxShadow: "none" }}
     >
