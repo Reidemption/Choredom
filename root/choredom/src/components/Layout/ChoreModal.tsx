@@ -24,9 +24,13 @@ import {
 } from "@chakra-ui/react";
 import { FiEdit } from "react-icons/fi";
 import { useState } from "react";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { auth, firestore } from "@/src/firebase/clientApp";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 export default function VerticallyCenter() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [user] = useAuthState(auth);
   const [choreForm, setChoreForm] = useState({
     choreName: "",
     choreDate: "",
@@ -37,6 +41,39 @@ export default function VerticallyCenter() {
     choreDescription: "",
   });
   const [formError, setFormError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleCreateChore = async () => {
+    setLoading(true);
+    try {
+      if (formError) setFormError("");
+      if (
+        !choreForm.choreName ||
+        !choreForm.choreDate ||
+        !choreForm.choreLocation
+      ) {
+        throw new Error("Please fill out all marked fields");
+      }
+
+      const choreDocRef = doc(firestore, "chores", choreForm.choreName);
+
+      await setDoc(choreDocRef, {
+        creatorId: user?.uid,
+        createdAt: serverTimestamp(),
+        Name: choreForm.choreName,
+        Date: choreForm.choreDate,
+        repeated: choreForm.repeated,
+        Location: choreForm.choreLocation,
+        NumFrequency: choreForm.choreNumFrequency,
+        Frequency: choreForm.choreFrequency,
+        Description: choreForm.choreDescription,
+      });
+    } catch (error) {
+      console.error("handleCreateChore error:", error);
+      setFormError(error.message);
+    }
+    setLoading(false);
+  };
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -89,7 +126,7 @@ export default function VerticallyCenter() {
         <ModalOverlay />
         <form onSubmit={onSubmit}>
           <ModalContent maxW="40rem">
-            <ModalHeader>Modal Title</ModalHeader>
+            <ModalHeader>Create New Chore</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Stack direction={"column"} spacing={2}>
@@ -145,10 +182,20 @@ export default function VerticallyCenter() {
                     onChange={onChange}
                   />
                 </FormControl>
+                {formError && (
+                  <Text color="red.500" fontSize="sm">
+                    {formError}
+                  </Text>
+                )}
               </Stack>
             </ModalBody>
             <ModalFooter>
-              <Button colorScheme={"purple"} type="submit">
+              <Button
+                colorScheme={"purple"}
+                type="submit"
+                isLoading={loading}
+                onClick={handleCreateChore}
+              >
                 Create Chore
               </Button>
               <Spacer />
