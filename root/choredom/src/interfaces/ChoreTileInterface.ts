@@ -1,7 +1,11 @@
 export default interface ChoreTileProps {
-  toDoDate: string;
-  choreName: string;
-  choreLocation: string;
-  choreDescription?: string;
-  choreFrequency?: string;
+	createdAt: string
+	NumFrequency?: number
+	creatorId: string
+	repeated?: boolean
+	Date: string
+	Name: string
+	Location: string
+	Description?: string
+	Frequency?: string
 }
