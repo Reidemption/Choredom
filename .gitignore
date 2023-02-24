@@ -1,2 +1,4 @@
 node_modules
-*/root/.env.local
+*/choredom/.env.local
+.vscode/
+
