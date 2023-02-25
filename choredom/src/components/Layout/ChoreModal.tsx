@@ -62,8 +62,6 @@ export default function VerticallyCenter() {
 				throw new Error('Please fill out all marked fields')
 			}
 
-			// const choreDocRef = doc(firestore, 'chores', choreForm.choreName)
-
 			const choreDocRef = await addDoc(collection(firestore, 'chores'), {
 				creatorId: user?.uid,
 				createdAt: serverTimestamp(),
@@ -76,6 +74,7 @@ export default function VerticallyCenter() {
 				Description: choreForm.choreDescription,
 			})
 			console.log('Document written with ID: ', choreDocRef.id)
+			onClose()
 		} catch (error) {
 			console.error('handleCreateChore error:', error)
 			setFormError(error.message)
