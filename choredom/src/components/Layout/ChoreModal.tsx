@@ -54,11 +54,7 @@ export default function VerticallyCenter() {
 		setLoading(true)
 		try {
 			if (formError) setFormError('')
-			if (
-				!choreForm.choreName ||
-				!choreForm.choreDate ||
-				!choreForm.choreLocation
-			) {
+			if (!choreForm.choreName || !choreForm.choreDate) {
 				throw new Error('Please fill out all marked fields')
 			}
 
@@ -72,6 +68,7 @@ export default function VerticallyCenter() {
 				NumFrequency: choreForm.choreNumFrequency,
 				Frequency: choreForm.choreFrequency,
 				Description: choreForm.choreDescription,
+				isDone: false,
 			})
 			console.log('Document written with ID: ', choreDocRef.id)
 			onClose()
@@ -173,7 +170,7 @@ export default function VerticallyCenter() {
 										</Select>
 									</FormControl>
 								)}
-								<FormControl isRequired>
+								<FormControl>
 									<FormLabel mb={0}>Chore Location</FormLabel>
 									<Input
 										id='choreLocation'
