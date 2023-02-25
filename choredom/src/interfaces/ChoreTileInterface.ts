@@ -5,7 +5,8 @@ export default interface ChoreTileProps {
 	repeated?: boolean
 	Date: string
 	Name: string
-	Location: string
+	Location?: string
 	Description?: string
 	Frequency?: string
+	isDone: boolean
 }
