@@ -1,43 +1,61 @@
 import React, { useEffect } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
-import { useRecoilValue } from 'recoil'
 import { auth } from '../firebase/clientApp'
-import { Button, Text } from '@chakra-ui/react'
-import { signOut } from 'firebase/auth'
+import { Button, Center, Flex, Skeleton, Stack, Text } from '@chakra-ui/react'
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth'
 import { useRouter } from 'next/router'
-import { authStateAtom } from '../atoms/authStateAtom'
-
+import { Avatar, AvatarBadge, AvatarGroup } from '@chakra-ui/react'
 type MyAccountProps = {}
 
 const MyAccount: React.FC<MyAccountProps> = () => {
-	const gUser = useRecoilValue(authStateAtom)
-	console.log('user', gUser)
-	const [user] = useAuthState(auth)
-
-	useEffect(() => {
-		if (user) {
-			console.log('User is logged in', user)
-		} else {
-			console.log('User is not logged in')
-		}
-	}, [user])
-
+	const [loaded, setLoaded] = React.useState(false)
+	const [currentUser, setCurrentUser] = React.useState<any>(null)
 	const router = useRouter()
+
+	const getAccountInfo = async () => {
+		const auth = getAuth()
+		onAuthStateChanged(auth, async (user) => {
+			try {
+				setCurrentUser(user)
+				setLoaded(false)
+			} catch (error) {
+				console.error('myAccount error:', error)
+			}
+		})
+	}
+	useEffect(() => {
+		getAccountInfo()
+	}, [])
 
 	const logout = () => {
 		console.log('logout')
 		signOut(auth)
-
 		router.push('/')
 	}
 
 	return (
-		<div>
-			<Text>{user?.email}</Text>
-			<Button colorScheme={'purple'} onClick={logout}>
-				Log out
-			</Button>
-		</div>
+		<Center border={'1px'} borderColor='white' w='70vh'>
+			<Stack direction='row' my='4'>
+				<Stack direction='column' alignItems={'center'}>
+					<Avatar size='md' name='User Avatar' src='/avatar_placeholder.jpg' />
+					<Text as='i'>Update Profile Picture</Text>
+				</Stack>
+				<Stack direction='column' px='3'>
+					<Text fontSize='xl' fontWeight='bold'>
+						Reid Gubler
+					</Text>
+					<Text fontSize='xl' fontWeight='bold'>
+						Username: Reidemption
+					</Text>
+					<Text fontSize='xl' fontWeight='bold'>
+						{currentUser?.email}
+					</Text>
+					<Button colorScheme={'purple'} onClick={logout}>
+						Log out
+					</Button>
+				</Stack>
+			</Stack>
+		</Center>
 	)
 }
 
