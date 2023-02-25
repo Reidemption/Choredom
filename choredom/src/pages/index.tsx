@@ -25,11 +25,9 @@ import { auth } from '../firebase/clientApp'
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth'
 import { FIREBASE_ERRORS } from '../firebase/errors'
 import { useAuthState } from 'react-firebase-hooks/auth'
-import { authStateAtom } from '../atoms/authStateAtom'
 import { useRecoilState } from 'recoil'
 
 export default function Home() {
-	const [gUser, setgUser] = useRecoilState(authStateAtom)
 	const router = useRouter()
 	const [show, setShow] = React.useState(false)
 	const handleClick = () => setShow(!show)
@@ -71,7 +69,7 @@ export default function Home() {
 	}
 
 	return (
-		<Flex align={'center'} justify={'center'} w={'175vh'}>
+		<Flex align={'center'} justify={'center'}>
 			<Center w={{ base: '50%', md: '100%' }}>
 				<Stack align='center' justify='center'>
 					<Text fontSize='5xl'>Choredom</Text>

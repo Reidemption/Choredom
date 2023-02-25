@@ -1,4 +1,4 @@
-import { Box, Center, Flex, Grid, Stack, Text } from '@chakra-ui/react'
+import { Box, Center, Flex, Grid, Stack, Spinner, Text } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import ChoreTile from '../components/ChoreTile'
 import ChoreProps from '../interfaces/ChoreTileInterface'
@@ -37,8 +37,14 @@ const Chore: React.FC = () => {
 
 	if (loading) {
 		return (
-			<Center>
-				<Text>Loading...</Text>
+			<Center h='100vh'>
+				<Spinner
+					thickness='4px'
+					speed='0.65s'
+					emptyColor='gray.200'
+					color='blue.500'
+					size='xl'
+				/>
 			</Center>
 		)
 	}
