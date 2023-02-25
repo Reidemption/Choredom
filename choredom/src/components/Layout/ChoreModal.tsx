@@ -43,7 +43,6 @@ export default function VerticallyCenter() {
 		choreDate: '',
 		repeated: false,
 		choreLocation: '',
-		choreNumFrequency: 0,
 		choreFrequency: '',
 		choreDescription: '',
 	})
@@ -65,7 +64,6 @@ export default function VerticallyCenter() {
 				Date: choreForm.choreDate,
 				repeated: choreForm.repeated,
 				Location: choreForm.choreLocation,
-				NumFrequency: choreForm.choreNumFrequency,
 				Frequency: choreForm.choreFrequency,
 				Description: choreForm.choreDescription,
 				isDone: false,
@@ -206,7 +204,14 @@ export default function VerticallyCenter() {
 								Create Chore
 							</Button>
 							<Spacer />
-							<Button onClick={onClose}>Close</Button>
+							<Button
+								onClick={() => {
+									setFormError('')
+									onClose
+								}}
+							>
+								Close
+							</Button>
 						</ModalFooter>
 					</ModalContent>
 				</form>
