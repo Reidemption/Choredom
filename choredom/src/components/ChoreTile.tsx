@@ -13,18 +13,10 @@ import {
 	Button,
 } from '@chakra-ui/react'
 import React from 'react'
-import ChoreTileProps from '../interfaces/ChoreTileInterface'
-import { AiOutlineEdit } from 'react-icons/ai'
-import { doc, updateDoc } from 'firebase/firestore'
-import { firestore } from '../firebase/clientApp'
+import EditChoreModal from './chore/EditChore'
 
-// TODO: Update the chore as done after 2 seconds.
+// TODO: Update the chore as done after 2 seconds?
 // TODO: Update portions of the chore. (i.e. change the date)
-// TODO: Make location not required. Show location if it exists.
-
-const EditChore: React.FC<any> = () => {
-	return <Icon as={AiOutlineEdit} boxSize={4} />
-}
 
 const ChoreTile: React.FC<any> = ({ finishChore, editChore, props }) => {
 	const id = props?.id
@@ -40,7 +32,6 @@ const ChoreTile: React.FC<any> = ({ finishChore, editChore, props }) => {
 		>
 			<Flex w='100%' m={5}>
 				<Checkbox w='10%' onChange={() => finishChore(id)}></Checkbox>
-				{/* <Button onClick={finishChore(id)}></Button> */}
 				<Spacer />
 				<HStack spacing={3} w='35%'>
 					<VStack spacing={0} align='start'>
@@ -58,12 +49,7 @@ const ChoreTile: React.FC<any> = ({ finishChore, editChore, props }) => {
 				<Box width={'50%'}>
 					<Text fontSize={'sm'}>{props.Description}</Text>
 				</Box>
-				<IconButton
-					aria-label='Edit chore'
-					size='xs'
-					icon={<EditChore />}
-					onClick={() => editChore}
-				/>
+				<EditChoreModal props={props} />
 			</Flex>
 		</Flex>
 	)
