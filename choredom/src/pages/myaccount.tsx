@@ -42,10 +42,10 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 				</Stack>
 				<Stack direction='column' px='3'>
 					<Text fontSize='xl' fontWeight='bold'>
-						Reid Gubler
+						Hardcoded Name
 					</Text>
 					<Text fontSize='xl' fontWeight='bold'>
-						Username: Reidemption
+						Hardcoded Username
 					</Text>
 					<Text fontSize='xl' fontWeight='bold'>
 						{currentUser?.email}
