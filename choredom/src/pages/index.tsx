@@ -55,7 +55,7 @@ export default function Home() {
 		event.preventDefault()
 
 		signInWithEmailAndPassword(loginForm.email, loginForm.password)
-
+		// TODO: need to make sure a user is presented.
 		if (!error) {
 			router.push('/chores')
 		}
@@ -126,20 +126,12 @@ export default function Home() {
 									type='submit'
 									colorScheme='purple'
 									variant='outline'
-									_hover={{
-										bg: 'purple',
-										color: 'white',
-									}}
 								>
 									Sign in
 								</Button>
 								<Divider />
 								<Button
 									colorScheme='purple'
-									_hover={{
-										bg: 'purple',
-										color: 'white',
-									}}
 									onClick={() => router.push('/register')}
 								>
 									<Link href='/register'>Create Account</Link>
