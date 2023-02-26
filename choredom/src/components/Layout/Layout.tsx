@@ -98,7 +98,6 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 				</NavItem>
 			))}
 			<VerticallyCenter />
-			<Divider pt={3} w='90%' />
 			<Spacer />
 			<Flex
 				align='center'
@@ -111,12 +110,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 					bg: 'cyan.400',
 					color: 'white',
 				}}
-			>
-				{/* Fill info about the chore locations
-            Check out 'zustand' for state management
-          */}
-				Chore Locations.
-			</Flex>
+			></Flex>
 			<Spacer />
 			<Link
 				href='/myaccount'
