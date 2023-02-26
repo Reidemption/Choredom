@@ -9,6 +9,7 @@ import {
 	getDocs,
 	doc,
 	updateDoc,
+	orderBy,
 } from 'firebase/firestore'
 import { auth, firestore } from '../firebase/clientApp'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
@@ -17,7 +18,6 @@ const Chore: React.FC = () => {
 	const [currentUser, setCurrentUser] = useState<any>(null)
 	const [user_chores, setUserChores] = useState<any[]>([])
 	const [loading, setLoading] = useState(true)
-	const [choreId, setChoreId] = useState(null)
 
 	const editChore = (id: any) => {
 		console.log('edit chore')
@@ -39,7 +39,10 @@ const Chore: React.FC = () => {
 		try {
 			const choreQuery = query(
 				collection(firestore, 'chores'),
-				where('creatorId', '==', currentUser?.uid)
+				where('creatorId', '==', currentUser?.uid),
+				// TODO: Fix the orderBy so it works with the date.
+				// - might have to change how date is stored in the database.
+				orderBy('Date')
 			)
 			const choreDocs = await getDocs(choreQuery)
 			const choreData = choreDocs.docs.map((doc) => ({
@@ -91,6 +94,19 @@ const Chore: React.FC = () => {
 			</Center>
 		)
 	}
+	// If the user has no chores
+	// TODO: Add a button to toggle showing completed chores.
+	if (
+		user_chores.filter((chore) => {
+			return !chore.isDone
+		}).length === 0
+	) {
+		return (
+			<Center h='100vh'>
+				<Text fontSize='xl'>You are all caught up on your chores!</Text>
+			</Center>
+		)
+	}
 
 	// TODO: Filter the chores to show them in chronological order.
 	return (
@@ -109,7 +125,6 @@ const Chore: React.FC = () => {
 								editChore={editChore}
 							></ChoreTile>
 						))}
-				hello
 			</Stack>
 		</Box>
 	)
