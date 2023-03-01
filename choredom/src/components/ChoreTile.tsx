@@ -18,7 +18,12 @@ import EditChoreModal from './chore/EditChore'
 // TODO: Update the chore as done after 2 seconds?
 // TODO: Update portions of the chore. (i.e. change the date)
 
-const ChoreTile: React.FC<any> = ({ finishChore, editChore, props }) => {
+const ChoreTile: React.FC<any> = ({
+	finishChore,
+	editChore,
+	props,
+	checked,
+}) => {
 	const id = props?.id
 
 	return (
@@ -31,7 +36,11 @@ const ChoreTile: React.FC<any> = ({ finishChore, editChore, props }) => {
 			bg={'white'}
 		>
 			<Flex w='100%' m={5}>
-				<Checkbox w='10%' onChange={() => finishChore(id)}></Checkbox>
+				<Checkbox
+					w='10%'
+					isChecked={checked}
+					onChange={() => finishChore(id)}
+				></Checkbox>
 				<Spacer />
 				<HStack spacing={3} w='35%'>
 					<VStack spacing={0} align='start'>
