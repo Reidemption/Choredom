@@ -26,11 +26,13 @@ import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth'
 import { FIREBASE_ERRORS } from '../firebase/errors'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { useRecoilState } from 'recoil'
+import { userState } from '../atom/atoms'
 
 export default function Home() {
 	const router = useRouter()
 	const [show, setShow] = React.useState(false)
 	const handleClick = () => setShow(!show)
+	const [currentUser, setCurrentUser] = useRecoilState(userState)
 
 	const [signInWithEmailAndPassword, user, loading, error] =
 		useSignInWithEmailAndPassword(auth)
@@ -55,10 +57,27 @@ export default function Home() {
 		event.preventDefault()
 
 		signInWithEmailAndPassword(loginForm.email, loginForm.password)
+			.then((userCredential) => {
+				if (userCredential) {
+					// Signed in
+					console.log(typeof userCredential.user, userCredential.user)
+					const { uid, email, displayName } = userCredential.user!
+					console.log(uid, email, displayName)
+					setCurrentUser({ uid, email, displayName })
+					// ...
+					router.push('/chores')
+				}
+			})
+			.catch((error) => {
+				const errorCode = error.code
+				const errorMessage = error.message
+				console.log('errorCode', errorCode)
+				console.log('errorMessage', errorMessage)
+			})
 		// TODO: need to make sure a user is presented.
-		if (!error) {
-			router.push('/chores')
-		}
+		// if (!error) {
+		// 	router.push('/chores')
+		// }
 	}
 
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
