@@ -99,21 +99,8 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 			))}
 			<VerticallyCenter />
 			<Spacer />
-			<Flex
-				align='center'
-				p='4'
-				mx='4'
-				borderRadius='lg'
-				role='group'
-				cursor='pointer'
-				_hover={{
-					bg: 'cyan.400',
-					color: 'white',
-				}}
-			></Flex>
-			<Spacer />
 			<Link
-				href='/myaccount'
+				href='/my-account'
 				style={{ textDecoration: 'none' }}
 				_focus={{ boxShadow: 'none' }}
 			>
