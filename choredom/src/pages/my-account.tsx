@@ -5,10 +5,13 @@ import { Button, Center, Flex, Skeleton, Stack, Text } from '@chakra-ui/react'
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth'
 import { useRouter } from 'next/router'
 import { Avatar, AvatarBadge, AvatarGroup } from '@chakra-ui/react'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import { userState } from '../atom/atoms'
 type MyAccountProps = {}
 
 const MyAccount: React.FC<MyAccountProps> = () => {
 	const [loaded, setLoaded] = React.useState(false)
+	const [gUser, setgUser] = useRecoilState(userState)
 	const [currentUser, setCurrentUser] = React.useState<any>(null)
 	const router = useRouter()
 
@@ -16,7 +19,8 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 		const auth = getAuth()
 		onAuthStateChanged(auth, async (user) => {
 			try {
-				setCurrentUser(user)
+				const { uid, email, displayName } = user!
+				setgUser({ uid, email, displayName })
 				setLoaded(false)
 			} catch (error) {
 				console.error('myAccount error:', error)
@@ -48,7 +52,7 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 						Hardcoded Username
 					</Text>
 					<Text fontSize='xl' fontWeight='bold'>
-						{currentUser?.email}
+						{gUser?.email}
 					</Text>
 					<Button colorScheme={'purple'} onClick={logout}>
 						Log out
