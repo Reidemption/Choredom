@@ -16,6 +16,7 @@ import {
 	where,
 	doc,
 	setDoc,
+	limit,
 } from 'firebase/firestore'
 import { firestore } from '../firebase/clientApp'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
@@ -24,17 +25,21 @@ const RequestTile = ({ request }: any) => {
 	const [loading, setLoading] = React.useState<boolean>(false)
 	const [error, setError] = React.useState<string>('')
 	const [success, setSuccess] = React.useState<string>('')
-	// TODO: Get info about the "request.friend_id" so their collection document can be updated as well.
+	const [friendInfo, setFriendInfo] = React.useState<any>(null)
 
 	const acceptRequest = async () => {
 		setLoading(true)
 		try {
-			const friendRef = doc(firestore, 'friends', request.id)
+			const originalRef = doc(firestore, 'friends', request.id)
+			await updateDoc(originalRef, {
+				status: 'accepted',
+			})
+			const friendRef = doc(firestore, 'friends', request.friend_id)
 			await updateDoc(friendRef, {
 				status: 'accepted',
 			})
 			setSuccess('Friend request accepted!')
-		} catch (error) {
+		} catch (error: any) {
 			setError(error.message)
 		}
 		setLoading(false)
@@ -48,16 +53,38 @@ const RequestTile = ({ request }: any) => {
 				status: 'rejected',
 			})
 			setSuccess('Friend request rejected!')
-		} catch (error) {
+		} catch (error: any) {
 			setError(error.message)
 		}
 		setLoading(false)
 	}
 
+	useEffect(() => {
+		async function getFriendInfo() {
+			setLoading(true)
+			try {
+				const friendQuery = query(
+					collection(firestore, 'users'),
+					where('uid', '==', request.id)
+				)
+				const friendDocs = await getDocs(friendQuery)
+				const friendData = friendDocs.docs.map((doc) => ({
+					...doc.data(),
+					id: doc.id,
+				}))
+				setFriendInfo(friendData[0])
+			} catch (error) {
+				console.error('getFriendInfo error:', error)
+			}
+			setLoading(false)
+		}
+		getFriendInfo()
+	}, [])
+
 	return (
 		<Flex
 			border={'1px'}
-			borderColor={'gray.200'}
+			borderColor={'gray'}
 			borderRadius={'md'}
 			p={4}
 			mb={4}
@@ -66,7 +93,7 @@ const RequestTile = ({ request }: any) => {
 			justifyContent={'space-between'}
 		>
 			<Stack direction={'column'}>
-				<Text fontWeight={'bold'}>{request.friend_id}</Text>
+				<Text fontWeight={'bold'}>{friendInfo?.email}</Text>
 				<Text>{request.status}</Text>
 			</Stack>
 			<Spacer />
@@ -112,13 +139,15 @@ const Connect: React.FC = () => {
 					console.log('Firebase error getting current user.')
 					throw new Error('Unable to process request. Please try again later.')
 				}
-				await setDoc(doc(firestore, 'friends', document.id), {
+				const docData = {
 					friend_id: user.uid,
 					status: 'pending',
-				})
+				}
+				// TODO: docData must be an array so I'll have to use a spread operator here.
+				await setDoc(doc(firestore, 'friends', document.id), docData)
 			})
 			setFriendSuccess('Friend request sent!')
-		} catch (error) {
+		} catch (error: any) {
 			setFriendError(error.message)
 		}
 		setLoading(false)
@@ -134,7 +163,11 @@ const Connect: React.FC = () => {
 		onAuthStateChanged(auth, async (user) => {
 			try {
 				const friendsRef = collection(firestore, 'friends')
-				const q = query(friendsRef, where('friend_id', '==', user?.uid))
+				const q = query(
+					friendsRef,
+					where(FieldPath.documentId(), '==', user?.uid),
+					limit(3)
+				)
 
 				const querySnapshot = await getDocs(q)
 				setCurrentUser(user)
@@ -171,7 +204,7 @@ const Connect: React.FC = () => {
 						))}
 				<Flex border={'2px'} p='3' borderColor={'GrayText'}>
 					<Stack direction='column' align={'center'} alignItems={'center'}>
-						<h1>Enhance your Choredom experience by adding your friends!</h1>
+						<h1>Enhance your Choredom experience by following your friends!</h1>
 						<form onSubmit={onSubmit}>
 							<Input
 								placeholder="Enter friend's email"
