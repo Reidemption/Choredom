@@ -34,8 +34,10 @@ import {
 } from 'firebase/firestore'
 import { auth, firestore } from '@/src/firebase/clientApp'
 import { useAuthState } from 'react-firebase-hooks/auth'
+import { useRouter } from 'next/router'
 
 export default function VerticallyCenter() {
+	const router = useRouter()
 	const { isOpen, onOpen, onClose } = useDisclosure()
 	const [user] = useAuthState(auth)
 	const [choreForm, setChoreForm] = useState({
@@ -45,6 +47,7 @@ export default function VerticallyCenter() {
 		choreLocation: '',
 		choreFrequency: '',
 		choreDescription: '',
+		shared: false,
 	})
 	const [formError, setFormError] = useState('')
 	const [loading, setLoading] = useState(false)
@@ -66,13 +69,18 @@ export default function VerticallyCenter() {
 				Location: choreForm.choreLocation,
 				Frequency: choreForm.choreFrequency,
 				Description: choreForm.choreDescription,
+				shared: choreForm.shared,
 				isDone: false,
 			})
 			console.log('Document written with ID: ', choreDocRef.id)
 			onClose()
-		} catch (error) {
+			setLoading(false)
+			if (router.pathname === '/chores') {
+				router.reload()
+			}
+		} catch (error: any) {
 			console.error('handleCreateChore error:', error)
-			setFormError(error.message)
+			setFormError('handleCreateChore error:' + error.message)
 		}
 		setLoading(false)
 	}
@@ -96,6 +104,10 @@ export default function VerticallyCenter() {
 	const onCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		console.log(e.target.checked)
 		setChoreForm({ ...choreForm, repeated: e.target.checked })
+	}
+	const onShareChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		console.log(e.target.checked)
+		setChoreForm({ ...choreForm, shared: e.target.checked })
 	}
 
 	return (
@@ -184,6 +196,15 @@ export default function VerticallyCenter() {
 										onChange={onChange}
 									/>
 								</FormControl>
+								<Checkbox
+									pt={1}
+									id='shared'
+									name='shared'
+									onChange={onShareChange}
+									isChecked={choreForm.shared}
+								>
+									Share Upon Completion?
+								</Checkbox>
 								{formError && (
 									<Text color='red.500' fontSize='sm'>
 										{formError}
