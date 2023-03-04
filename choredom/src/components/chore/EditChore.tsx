@@ -28,13 +28,11 @@ const EditChore: React.FC<any> = () => {
 }
 
 const EditChoreModal: React.FC<any> = ({
-	onSubmit,
 	handleEditChore,
 	handleDeleteChore,
 	loading,
 	props,
 }) => {
-	const id = props?.id
 	const { isOpen, onOpen, onClose } = useDisclosure()
 	const [choreForm, setChoreForm] = useState({
 		Name: props.Name,
@@ -44,6 +42,7 @@ const EditChoreModal: React.FC<any> = ({
 		Frequency: props.Frequency,
 		Description: props.Description,
 		isDone: false,
+		shared: false,
 	})
 
 	const resetChoreForm = () => {
@@ -54,7 +53,8 @@ const EditChoreModal: React.FC<any> = ({
 			Location: props.Location,
 			Frequency: props.Frequency,
 			Description: props.Description,
-			isDone: false,
+			isDone: props.isDone,
+			shared: props.shared,
 		})
 		onClose()
 	}
@@ -65,6 +65,21 @@ const EditChoreModal: React.FC<any> = ({
 		>
 	) => {
 		setChoreForm({ ...choreForm, [e.target.name]: e.target.value })
+	}
+
+	const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
+		handleEditChore(choreForm)
+	}
+
+	const onCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		console.log(e.target.checked)
+		setChoreForm({ ...choreForm, repeated: e.target.checked })
+	}
+
+	const onShareChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		console.log(e.target.checked)
+		setChoreForm({ ...choreForm, shared: e.target.checked })
 	}
 
 	return (
@@ -104,6 +119,15 @@ const EditChoreModal: React.FC<any> = ({
 											type='date'
 										/>
 									</FormControl>
+									<Checkbox
+										pt={4}
+										id='repeated'
+										name='repeated'
+										onChange={onCheckboxChange}
+										isChecked={choreForm.repeated}
+									>
+										Repeated?
+									</Checkbox>
 								</Stack>
 								{choreForm.repeated && (
 									<FormControl isRequired>
@@ -135,11 +159,15 @@ const EditChoreModal: React.FC<any> = ({
 										onChange={onChange}
 									/>
 								</FormControl>
-								{/* {formError && (
-								<Text color='red.500' fontSize='sm'>
-									{formError}
-								</Text>
-							)} */}
+								<Checkbox
+									pt={1}
+									id='shared'
+									name='shared'
+									onChange={onShareChange}
+									isChecked={choreForm.shared}
+								>
+									Share Upon Completion?
+								</Checkbox>
 							</Stack>
 						</ModalBody>
 						<ModalFooter>
@@ -148,11 +176,11 @@ const EditChoreModal: React.FC<any> = ({
 								type='submit'
 								isLoading={loading}
 								onClick={() => {
-									handleEditChore()
-									onClose
+									handleEditChore(choreForm, props.id)
+									onClose()
 								}}
 							>
-								Create Chore
+								Update Chore
 							</Button>
 							<Button
 								ml={3}
@@ -161,8 +189,8 @@ const EditChoreModal: React.FC<any> = ({
 								type='submit'
 								isLoading={loading}
 								onClick={() => {
-									handleDeleteChore()
-									onClose
+									handleDeleteChore(props.id)
+									onClose()
 								}}
 							>
 								Delete Chore

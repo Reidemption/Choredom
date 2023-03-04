@@ -19,6 +19,7 @@ import {
 	doc,
 	updateDoc,
 	orderBy,
+	deleteDoc,
 } from 'firebase/firestore'
 import { auth, firestore } from '../firebase/clientApp'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
@@ -32,18 +33,38 @@ const Chore: React.FC = () => {
 	const [loading, setLoading] = useState(false)
 	const [oldChores, setOldChores] = useState<boolean>(false)
 
-	const editChore = (id: any) => {
-		console.log('edit chore')
+	const editChore = async (chore: any, id: any) => {
+		if (id) {
+			const choreRef = doc(firestore, 'chores', id)
+			await updateDoc(choreRef, {
+				...chore,
+			})
+			getChores()
+		}
 	}
 
-	// TODO: If the chore is reoccurring, update the date to the next date instead of deleting it.
-	// TODO: If the chore "shared" then open a dialog to allow the user to submit a photo of the chore being done.
-	const finishChore = async (id: any) => {
-		const choreRef = doc(firestore, 'chores', id)
-		await updateDoc(choreRef, {
-			isDone: true,
-		})
-		console.log('chore finished')
+	const deleteChore = async (id: any) => {
+		if (id) {
+			const choreRef = doc(firestore, 'chores', id)
+			await deleteDoc(choreRef)
+			getChores()
+		}
+	}
+
+	const finishChore = async (chore: any, id: any) => {
+		if (chore.shared) {
+			// TODO: If the chore "shared" then open a dialog to allow the user to submit a photo of the chore being done.
+		}
+		if (chore.repeated) {
+			// TODO: If the chore is reoccurring, update the date to the next date instead of deleting it.
+		}
+		if (!chore.repeated) {
+			const choreRef = doc(firestore, 'chores', id)
+			await updateDoc(choreRef, {
+				isDone: !chore?.status,
+			})
+			console.log('chore finished')
+		}
 		getChores()
 	}
 
@@ -176,6 +197,7 @@ const Chore: React.FC = () => {
 							checked={chore.isDone}
 							finishChore={finishChore}
 							editChore={editChore}
+							deleteChore={deleteChore}
 						></ChoreTile>
 					))}
 				<Button onClick={showOldChores} colorScheme='purple'>
