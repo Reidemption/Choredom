@@ -18,6 +18,7 @@ import {
 	FormHelperText,
 	Link,
 	ButtonGroup,
+	useBreakpointValue,
 } from '@chakra-ui/react'
 import React, { useEffect, useRef } from 'react'
 import { Router, useRouter } from 'next/router'
@@ -38,14 +39,15 @@ export default function Home() {
 		useSignInWithEmailAndPassword(auth)
 
 	const [validUser, loadingUser, errorAuth] = useAuthState(auth)
+	const hasMediumScreen = useBreakpointValue({ base: false, md: true })
 
-	useEffect(() => {
-		if (validUser) {
-			console.log('validUser', typeof validUser, validUser)
-			// setgUser((prev) => ({ ...prev, uid: validUser?.uid, email: validUser?.email }));
-			router.push('/chores')
-		}
-	}, [])
+	// useEffect(() => {
+	// 	if (validUser) {
+	// 		console.log('validUser', typeof validUser, validUser)
+	// 		// setgUser((prev) => ({ ...prev, uid: validUser?.uid, email: validUser?.email }));
+	// 		router.push('/chores')
+	// 	}
+	// }, [])
 
 	const [loginForm, setLoginForm] = React.useState({
 		email: '',
@@ -88,20 +90,19 @@ export default function Home() {
 	}
 
 	return (
-		<Flex align={'center'} justify={'center'}>
-			<Center w={{ base: '50%', md: '100%' }}>
-				<Stack align='center' justify='center'>
-					<Text fontSize='5xl'>Choredom</Text>
-					<Image
-						w={{ base: '50%', md: '500px' }}
-						h={{ base: '50%', md: '500px' }}
-						src='/chore_list.svg'
-						alt='Man showing off his chores list'
-					/>
-				</Stack>
-			</Center>
-			<Spacer />
-			<Center w={{ base: '50%', md: '100%' }}>
+		<Stack
+			direction={hasMediumScreen ? 'row' : 'column-reverse'}
+			spacing={'8'}
+			justify='center'
+			align='center'
+		>
+			<Image
+				w={{ base: '50%', md: '500px' }}
+				h={{ base: '50%', md: '500px' }}
+				src='/chore_list.svg'
+				alt='Man showing off his chores list'
+			/>
+			<Center w={{ base: '50%', md: '500px' }}>
 				<Box rounded={'lg'} boxShadow={'lg'} p={8} bg={'white'}>
 					<Stack spacing={4}>
 						<form id='signIn' onSubmit={onSubmit}>
@@ -160,6 +161,6 @@ export default function Home() {
 					</Stack>
 				</Box>
 			</Center>
-		</Flex>
+		</Stack>
 	)
 }
