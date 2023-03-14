@@ -10,108 +10,21 @@ import {
 import React, { useEffect } from 'react'
 import {
 	collection,
-	getDocs,
+	getDoc,
 	query,
 	updateDoc,
 	where,
 	doc,
 	setDoc,
+	runTransaction,
 	limit,
+	arrayUnion,
+	getDocs,
 } from 'firebase/firestore'
 import { firestore } from '../firebase/clientApp'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-
-const RequestTile = ({ request }: any) => {
-	const [loading, setLoading] = React.useState<boolean>(false)
-	const [error, setError] = React.useState<string>('')
-	const [success, setSuccess] = React.useState<string>('')
-	const [friendInfo, setFriendInfo] = React.useState<any>(null)
-
-	const acceptRequest = async () => {
-		setLoading(true)
-		try {
-			const originalRef = doc(firestore, 'friends', request.id)
-			await updateDoc(originalRef, {
-				status: 'accepted',
-			})
-			const friendRef = doc(firestore, 'friends', request.friend_id)
-			await updateDoc(friendRef, {
-				status: 'accepted',
-			})
-			setSuccess('Friend request accepted!')
-		} catch (error: any) {
-			setError(error.message)
-		}
-		setLoading(false)
-	}
-
-	const rejectRequest = async () => {
-		setLoading(true)
-		try {
-			const friendRef = doc(firestore, 'friends', request.id)
-			await updateDoc(friendRef, {
-				status: 'rejected',
-			})
-			setSuccess('Friend request rejected!')
-		} catch (error: any) {
-			setError(error.message)
-		}
-		setLoading(false)
-	}
-
-	useEffect(() => {
-		async function getFriendInfo() {
-			setLoading(true)
-			try {
-				const friendQuery = query(
-					collection(firestore, 'users'),
-					where('uid', '==', request.id)
-				)
-				const friendDocs = await getDocs(friendQuery)
-				const friendData = friendDocs.docs.map((doc) => ({
-					...doc.data(),
-					id: doc.id,
-				}))
-				setFriendInfo(friendData[0])
-			} catch (error) {
-				console.error('getFriendInfo error:', error)
-			}
-			setLoading(false)
-		}
-		getFriendInfo()
-	}, [])
-
-	return (
-		<Flex
-			border={'1px'}
-			borderColor={'gray'}
-			borderRadius={'md'}
-			p={4}
-			mb={4}
-			w={'full'}
-			alignItems={'center'}
-			justifyContent={'space-between'}
-		>
-			<Stack direction={'column'}>
-				<Text fontWeight={'bold'}>{friendInfo?.email}</Text>
-				<Text>{request.status}</Text>
-			</Stack>
-			<Spacer />
-			<Stack direction={'row'}>
-				<Button
-					colorScheme={'green'}
-					isLoading={loading}
-					onClick={acceptRequest}
-				>
-					Accept
-				</Button>
-				<Button colorScheme={'red'} isLoading={loading} onClick={rejectRequest}>
-					Reject
-				</Button>
-			</Stack>
-		</Flex>
-	)
-}
+import RequestTile from '../components/RequestTile'
+import { log } from 'console'
 
 const Connect: React.FC = () => {
 	const [search, setSearch] = React.useState<string>('')
@@ -120,6 +33,9 @@ const Connect: React.FC = () => {
 	const [loading, setLoading] = React.useState<boolean>(false)
 	const [currentUser, setCurrentUser] = React.useState<any>(null)
 	const [requests, setRequests] = React.useState<any[]>([])
+	const [error, setError] = React.useState<string>('')
+	const [success, setSuccess] = React.useState<string>('')
+	const [tileLoading, setTileLoading] = React.useState<boolean>(false)
 
 	const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		setLoading(true)
@@ -129,23 +45,57 @@ const Connect: React.FC = () => {
 			if (search === user?.email) {
 				throw new Error('You cannot add yourself as a friend!')
 			}
-			const friendsRef = collection(firestore, 'users')
-			const q = query(friendsRef, where('email', '==', search))
 
-			const querySnapshot = await getDocs(q)
-			querySnapshot.forEach(async (document) => {
-				// friend_id
-				if (!user) {
-					console.log('Firebase error getting current user.')
-					throw new Error('Unable to process request. Please try again later.')
+			await runTransaction(firestore, async (transaction) => {
+				const q = query(
+					collection(firestore, 'users'),
+					where('email', '==', search)
+				)
+				let friendDoc
+				const querySnapshot = await getDocs(q) //should only be one result
+				querySnapshot.forEach((doc) => {
+					friendDoc = doc.data() //friendDoc should contain all the information about the friend (uid, email, etc.)
+				})
+
+				if (!friendDoc) {
+					throw new Error("error finding friend's document")
 				}
-				const docData = {
+				const friendDocRef = doc(firestore, 'friends', friendDoc?.uid)
+				const friendDocSearch = await transaction.get(friendDocRef)
+				const friendDocData = {
 					friend_id: user.uid,
 					status: 'pending',
+					sender_id: user.uid,
 				}
-				// TODO: docData must be an array so I'll have to use a spread operator here.
-				await setDoc(doc(firestore, 'friends', document.id), docData)
+
+				const submitterDocRef = doc(firestore, 'friends', user?.uid)
+				const submitterDoc = await transaction.get(submitterDocRef)
+				const docData = {
+					friend_id: friendDoc.uid,
+					status: 'pending',
+					sender_id: user.uid,
+				}
+				if (!friendDocSearch.exists() || !friendDocSearch.data()?.friends) {
+					// If the document doesn't exist, create it.
+					console.log('creating frienddoc friends array field')
+					transaction.set(friendDocRef, { friends: [friendDocData] })
+				} else {
+					transaction.update(friendDocRef, {
+						friends: [...friendDocSearch.data()?.friends, friendDocData],
+					})
+				}
+
+				if (!submitterDoc.exists() || !submitterDoc.data()?.friends) {
+					// If the document doesn't exist, create it.
+					console.log('creating submitter friends array field')
+					transaction.set(submitterDocRef, { friends: [docData] })
+				} else {
+					transaction.update(submitterDocRef, {
+						friends: [...submitterDoc.data()?.friends, docData],
+					})
+				}
 			})
+
 			setFriendSuccess('Friend request sent!')
 		} catch (error: any) {
 			setFriendError(error.message)
@@ -157,36 +107,129 @@ const Connect: React.FC = () => {
 		setSearch(e.target.value)
 	}
 
+	const acceptRequest = async (req: any) => {
+		setTileLoading(true)
+		handleRequest(req, 'accepted')
+		setTileLoading(false)
+	}
+
+	const rejectRequest = async (req: any) => {
+		setTileLoading(true)
+		handleRequest(req, 'rejected')
+		setTileLoading(false)
+	}
+
+	const handleRequest = async (req: any, rStatus: string) => {
+		const user = currentUser
+		try {
+			await runTransaction(firestore, async (transaction) => {
+				const myDocData = {
+					friend_id: req.friend_id,
+					status: rStatus,
+					sender_id: req.sender_id,
+				}
+				const friendDocData = {
+					friend_id: user.uid,
+					status: rStatus,
+					sender_id: req.sender_id,
+				}
+				const myDocRef = doc(firestore, 'friends', user.uid)
+				const myDocSearch = await transaction.get(myDocRef)
+
+				const submitterDocRef = doc(firestore, 'friends', req.sender_id)
+				const submitterDoc = await transaction.get(submitterDocRef)
+
+				if (!myDocSearch.exists() || !myDocSearch.data()?.friends) {
+					// If the document doesn't exist, throw an error.
+					console.log('Error finding document')
+					throw new Error("error finding friend's document")
+				}
+
+				// find index in array where friend_id = req.friend_id and sender_id = req.sender_id and status = pending
+				// then update that index with the new status
+				// if no index is found, throw an error
+				const index1 = myDocSearch
+					.data()
+					?.friends.findIndex(
+						(friend: any) =>
+							friend.friend_id === req.friend_id &&
+							friend.sender_id === req.sender_id &&
+							friend.status === 'pending'
+					)
+				if (index1 === -1) {
+					throw new Error("error finding index of friend's document")
+				}
+				let arr1 = [...myDocSearch.data()?.friends]
+				arr1[index1] = myDocData
+				transaction.update(myDocRef, {
+					friends: [...arr1],
+				})
+				if (!submitterDoc.exists() || !submitterDoc.data()?.friends) {
+					// If the document doesn't exist, throw an error.
+					throw new Error('error finding friend request')
+				}
+				// find index in array where friend_id = req.friend_id and sender_id = req.sender_id and status = pending
+				// then update that index with the new status
+				// if no index is found, throw an error
+				const index2 = submitterDoc
+					.data()
+					?.friends.findIndex(
+						(friend: any) =>
+							user.uid === friend.friend_id &&
+							friend.sender_id === req.sender_id &&
+							friend.status === 'pending'
+					)
+				if (index2 === -1) {
+					throw new Error('error finding friend request')
+				}
+				let arr2 = [...submitterDoc.data()?.friends]
+				arr2[index2] = friendDocData
+				transaction.update(submitterDocRef, {
+					friends: [...arr2],
+				})
+			})
+
+			setFriendSuccess('Friend request sent!')
+		} catch (error: any) {
+			setFriendError(error.message)
+		}
+	}
+
 	const getRequests = async () => {
 		setLoading(true)
 		const auth = getAuth()
 		onAuthStateChanged(auth, async (user) => {
 			try {
-				const friendsRef = collection(firestore, 'friends')
-				const q = query(
-					friendsRef,
-					where(FieldPath.documentId(), '==', user?.uid),
-					limit(3)
-				)
-
-				const querySnapshot = await getDocs(q)
+				if (!user) {
+					throw new Error('User error. Try again later.')
+				}
 				setCurrentUser(user)
-				const requests = querySnapshot.docs.map((doc) => ({
-					...doc.data(),
-					id: doc.id,
-				}))
+				const friendsRef = doc(firestore, 'friends', user.uid)
+				const docSnap = await getDoc(friendsRef)
+				if (!docSnap.exists()) {
+					throw new Error('Possibility of no friends.')
+				}
+				let requests = docSnap.data()?.friends
+				if (requests) {
+					requests = requests.filter((friend: any) => {
+						return friend.status === 'pending'
+					})
+				}
 				setRequests(requests)
 			} catch (error) {
-				console.log(error)
+				console.log('Error detected in getRequests', error)
 			}
 		})
 		setLoading(false)
 	}
 
-	const exist_requests = requests.length > 0
+	const exist_requests = requests?.length > 0
 
 	useEffect(() => {
-		getRequests()
+		async function onInitialization() {
+			getRequests()
+		}
+		onInitialization()
 	}, [])
 
 	return (
@@ -196,11 +239,17 @@ const Connect: React.FC = () => {
 				{!loading &&
 					exist_requests &&
 					requests
-						.filter((request) => {
-							return request.status === 'pending'
+						.filter((req) => {
+							return req.sender_id != currentUser.uid
 						})
 						.map((request) => (
-							<RequestTile key={request.idfire} request={request} />
+							<RequestTile
+								key={request.sender_id}
+								request={request}
+								rejectRequest={rejectRequest}
+								acceptRequest={acceptRequest}
+								loading={tileLoading}
+							/>
 						))}
 				<Flex border={'2px'} p='3' borderColor={'GrayText'}>
 					<Stack direction='column' align={'center'} alignItems={'center'}>
