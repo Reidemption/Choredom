@@ -7,13 +7,11 @@ const RequestTile: React.FC<any> = ({
 	request,
 	acceptRequest,
 	rejectRequest,
-	success,
-	error,
 	loading,
 }) => {
 	const [senderInfo, setSenderInfo] = React.useState<any>(null)
 	const getSenderInfo = async () => {
-		const senderDoc = await getDoc(doc(firestore, 'users', request?.sender_id))
+		const senderDoc = await getDoc(doc(firestore, 'users', request?.friend_id))
 		if (senderDoc.data()) {
 			setSenderInfo(senderDoc?.data()?.displayName || senderDoc?.data()?.email)
 		}
@@ -42,24 +40,28 @@ const RequestTile: React.FC<any> = ({
 			</Stack>
 			<Spacer />
 			<Stack direction={'row'}>
-				<Button
-					colorScheme={'green'}
-					isLoading={loading}
-					onClick={() => {
-						acceptRequest(request)
-					}}
-				>
-					Accept
-				</Button>
-				<Button
-					colorScheme={'red'}
-					isLoading={loading}
-					onClick={() => {
-						rejectRequest(request)
-					}}
-				>
-					Reject
-				</Button>
+				{request.status != 'accepted' && (
+					<Button
+						colorScheme={'green'}
+						isLoading={loading}
+						onClick={() => {
+							acceptRequest(request)
+						}}
+					>
+						Accept
+					</Button>
+				)}
+				{request.status != 'rejected' && (
+					<Button
+						colorScheme={'red'}
+						isLoading={loading}
+						onClick={() => {
+							rejectRequest(request)
+						}}
+					>
+						Reject
+					</Button>
+				)}
 			</Stack>
 		</Flex>
 	)
