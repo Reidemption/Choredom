@@ -14,9 +14,8 @@ const RequestTile: React.FC<any> = ({
 	const [senderInfo, setSenderInfo] = React.useState<any>(null)
 	const getSenderInfo = async () => {
 		const senderDoc = await getDoc(doc(firestore, 'users', request?.sender_id))
-		console.log('senderDoc', senderDoc.data())
 		if (senderDoc.data()) {
-			setSenderInfo(senderDoc.data().displayName || senderDoc.data().email)
+			setSenderInfo(senderDoc?.data()?.displayName || senderDoc?.data()?.email)
 		}
 	}
 
