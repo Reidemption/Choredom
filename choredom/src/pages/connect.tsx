@@ -36,6 +36,7 @@ const Connect: React.FC = () => {
 	const [error, setError] = React.useState<string>('')
 	const [success, setSuccess] = React.useState<string>('')
 	const [tileLoading, setTileLoading] = React.useState<boolean>(false)
+	const [allRequests, setAllRequests] = React.useState<boolean>(false)
 
 	const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		setLoading(true)
@@ -109,13 +110,15 @@ const Connect: React.FC = () => {
 
 	const acceptRequest = async (req: any) => {
 		setTileLoading(true)
-		handleRequest(req, 'accepted')
+		await handleRequest(req, 'accepted')
+		await getRequests()
 		setTileLoading(false)
 	}
 
 	const rejectRequest = async (req: any) => {
 		setTileLoading(true)
-		handleRequest(req, 'rejected')
+		await handleRequest(req, 'rejected')
+		await getRequests()
 		setTileLoading(false)
 	}
 
@@ -154,7 +157,7 @@ const Connect: React.FC = () => {
 						(friend: any) =>
 							friend.friend_id === req.friend_id &&
 							friend.sender_id === req.sender_id &&
-							friend.status === 'pending'
+							friend.status === req.status
 					)
 				if (index1 === -1) {
 					throw new Error("error finding index of friend's document")
@@ -177,7 +180,7 @@ const Connect: React.FC = () => {
 						(friend: any) =>
 							user.uid === friend.friend_id &&
 							friend.sender_id === req.sender_id &&
-							friend.status === 'pending'
+							friend.status === req.status
 					)
 				if (index2 === -1) {
 					throw new Error('error finding friend request')
@@ -189,7 +192,10 @@ const Connect: React.FC = () => {
 				})
 			})
 
-			setFriendSuccess('Friend request sent!')
+			setFriendSuccess(`Friend request ${rStatus}!`)
+			setTimeout(() => {
+				setFriendSuccess(``)
+			}, 1500)
 		} catch (error: any) {
 			setFriendError(error.message)
 		}
@@ -210,11 +216,6 @@ const Connect: React.FC = () => {
 					throw new Error('Possibility of no friends.')
 				}
 				let requests = docSnap.data()?.friends
-				if (requests) {
-					requests = requests.filter((friend: any) => {
-						return friend.status === 'pending'
-					})
-				}
 				setRequests(requests)
 			} catch (error) {
 				console.log('Error detected in getRequests', error)
@@ -242,9 +243,12 @@ const Connect: React.FC = () => {
 						.filter((req) => {
 							return req.sender_id != currentUser.uid
 						})
-						.map((request) => (
+						.filter((req) => {
+							return req.status === 'pending'
+						})
+						.map((request, index) => (
 							<RequestTile
-								key={request.sender_id}
+								key={index}
 								request={request}
 								rejectRequest={rejectRequest}
 								acceptRequest={acceptRequest}
