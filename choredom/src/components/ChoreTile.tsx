@@ -24,6 +24,19 @@ const ChoreTile: React.FC<any> = ({
 	props,
 	checked,
 }) => {
+	const today = () => {
+		const date = new Date()
+		const day = date.getDate()
+		const month = date.getMonth() + 1
+		const year = date.getFullYear()
+		return `${year}-${month}-${day}`
+	}
+
+	const dateColor = () => {
+		console.log(props.Date, today)
+		const day = today()
+		return new Date(props.Date) < new Date(day) ? 'red' : ''
+	}
 	return (
 		<Flex
 			align='center'
@@ -43,10 +56,7 @@ const ChoreTile: React.FC<any> = ({
 				<HStack spacing={3} w='35%'>
 					<VStack spacing={0} align='start'>
 						<Text mt={0}>{props.Name}</Text>
-						<Text>
-							Due:
-							<span> {props.Date}</span>
-						</Text>
+						<Text color={dateColor()}>{props.Date}</Text>
 						<Text textAlign={'center'} as='i'>
 							{props.Frequency}
 						</Text>

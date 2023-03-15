@@ -116,19 +116,6 @@ const Chore: React.FC = () => {
 		})
 	}
 
-	// eg 2023/03/10 gets converted to 20230310
-	function monthToComparableNumber(date: string) {
-		if (date === undefined || date === null || date.length !== 10) {
-			return null
-		}
-
-		const yearNumber = Number.parseInt(date.substring(0, 4))
-		const dayNumber = Number.parseInt(date.substring(8, 10))
-		const monthNumber = Number.parseInt(date.substring(5, 7))
-
-		return yearNumber * 10000 + monthNumber * 100 + dayNumber
-	}
-
 	const getChores = async () => {
 		setLoading(true)
 		console.log('currentUser', currentUser)
@@ -169,7 +156,7 @@ const Chore: React.FC = () => {
 				<Text fontSize={'xl'} color={'blue.400'}>
 					<Link href='register'>Create an account&nbsp;</Link>
 				</Text>
-				<Text fontSize='xl'> to keep track of chores!</Text>
+				<Text fontSize='xl'> to keep track of chores!</Text>bnv
 			</Center>
 		)
 	}
@@ -200,7 +187,7 @@ const Chore: React.FC = () => {
 			</Center>
 		)
 	}
-	// TODO: Filter the chores to show them in chronological order.
+
 	return (
 		<Box>
 			<Stack direction={'column'} spacing='6' align={'center'} mt='3'>
