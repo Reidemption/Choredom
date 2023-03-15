@@ -104,13 +104,29 @@ const Chore: React.FC = () => {
 					...doc.data(),
 					id: doc.id,
 				}))
-				console.log(choreData)
-				setUserChores(choreData)
+				setUserChores(
+					choreData.sort((a, b) => {
+						return new Date(b.Date).valueOf() - new Date(a.Date).valueOf()
+					})
+				)
 			} catch (error) {
 				console.error('getChores error:', error)
 			}
 			setLoading(false)
 		})
+	}
+
+	// eg 2023/03/10 gets converted to 20230310
+	function monthToComparableNumber(date: string) {
+		if (date === undefined || date === null || date.length !== 10) {
+			return null
+		}
+
+		const yearNumber = Number.parseInt(date.substring(0, 4))
+		const dayNumber = Number.parseInt(date.substring(8, 10))
+		const monthNumber = Number.parseInt(date.substring(5, 7))
+
+		return yearNumber * 10000 + monthNumber * 100 + dayNumber
 	}
 
 	const getChores = async () => {
@@ -171,8 +187,7 @@ const Chore: React.FC = () => {
 			</Center>
 		)
 	}
-	// If the user has no chores
-	// TODO: Add a button to toggle showing completed chores.
+
 	if (allChoresAreDone === 0) {
 		return (
 			<Center h='100vh'>
