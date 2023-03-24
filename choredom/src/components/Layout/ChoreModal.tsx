@@ -110,6 +110,58 @@ export default function VerticallyCenter() {
 		setChoreForm({ ...choreForm, shared: e.target.checked })
 	}
 
+	if (!user) {
+		return( 
+				<><Flex
+				onClick={onOpen}
+				align='center'
+				p='4'
+				mx='4'
+				borderRadius='lg'
+				role='group'
+				cursor='pointer'
+				_hover={{
+					bg: 'cyan.400',
+					color: 'white',
+				}}
+			>
+				<Icon
+					mr='4'
+					fontSize='16'
+					_groupHover={{
+						color: 'white',
+					}}
+					as={FiEdit}
+				/>
+				Add Chore
+			</Flex>
+
+			<Modal onClose={onClose} isOpen={isOpen}>
+				<ModalOverlay />
+					<ModalContent maxW='40rem'>
+						<ModalHeader>Must Log In to Create a Chore</ModalHeader>
+						<ModalCloseButton />
+						<ModalBody>
+							<Text>Please sign in to create a chore</Text>
+						</ModalBody>
+						<ModalFooter>
+							<Button>
+								<Link href='/'>Login</Link>
+							</Button>
+							<Spacer />
+							<Button
+								onClick={
+									onClose
+								}
+							>
+								Close
+							</Button>
+						</ModalFooter>
+					</ModalContent>
+					</Modal>
+			</>
+		)
+}
 	return (
 		<>
 			<Flex

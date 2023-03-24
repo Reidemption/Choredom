@@ -33,7 +33,6 @@ const ChoreTile: React.FC<any> = ({
 	}
 
 	const dateColor = () => {
-		console.log(props.Date, today)
 		const day = today()
 		return new Date(props.Date) < new Date(day) ? 'red' : ''
 	}

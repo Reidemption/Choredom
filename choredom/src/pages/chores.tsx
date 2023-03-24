@@ -105,7 +105,7 @@ const Chore: React.FC = () => {
 					id: doc.id,
 				}))
 				setUserChores(
-					choreData.sort((a, b) => {
+					choreData.sort((a : any, b : any) => {
 						return new Date(b.Date).valueOf() - new Date(a.Date).valueOf()
 					})
 				)
@@ -140,7 +140,7 @@ const Chore: React.FC = () => {
 	})
 
 	const allChoresAreDone = user_chores.filter((chore) => {
-		return chore.isDone
+		return chore.isDone == true
 	}).length
 
 	useEffect(() => {
@@ -156,7 +156,7 @@ const Chore: React.FC = () => {
 				<Text fontSize={'xl'} color={'blue.400'}>
 					<Link href='register'>Create an account&nbsp;</Link>
 				</Text>
-				<Text fontSize='xl'> to keep track of chores!</Text>bnv
+				<Text fontSize='xl'> to keep track of chores!</Text>
 			</Center>
 		)
 	}

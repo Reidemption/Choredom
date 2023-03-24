@@ -61,7 +61,7 @@ const Connect: React.FC = () => {
 				if (!friendDoc) {
 					throw new Error("error finding friend's document")
 				}
-				const friendDocRef = doc(firestore, 'friends', friendDoc?.uid)
+				const friendDocRef = doc(firestore, 'friends', friendDoc!.uid)
 				const friendDocSearch = await transaction.get(friendDocRef)
 				const friendDocData = {
 					friend_id: user.uid,
@@ -72,7 +72,7 @@ const Connect: React.FC = () => {
 				const submitterDocRef = doc(firestore, 'friends', user?.uid)
 				const submitterDoc = await transaction.get(submitterDocRef)
 				const docData = {
-					friend_id: friendDoc.uid,
+					friend_id: friendDoc!.uid,
 					status: 'pending',
 					sender_id: user.uid,
 				}
