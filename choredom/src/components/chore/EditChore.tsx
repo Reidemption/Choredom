@@ -69,7 +69,7 @@ const EditChoreModal: React.FC<any> = ({
 
 	const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-		handleEditChore(choreForm)
+		handleEditChore(choreForm, props.id)
 	}
 
 	const onCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {

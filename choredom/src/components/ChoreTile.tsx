@@ -49,7 +49,7 @@ const ChoreTile: React.FC<any> = ({
 				<Checkbox
 					w='10%'
 					isChecked={checked}
-					onChange={() => finishChore(props.isDone, props.id)}
+					onChange={() => finishChore(props, props.id)}
 				></Checkbox>
 				<Spacer />
 				<HStack spacing={3} w='35%'>

@@ -34,6 +34,8 @@ const Chore: React.FC = () => {
 	const [oldChores, setOldChores] = useState<boolean>(false)
 
 	const editChore = async (chore: any, id: any) => {
+		console.log('edit chore called');
+		console.log('chore:',chore, 'id:', id);
 		if (id) {
 			const choreRef = doc(firestore, 'chores', id)
 			await updateDoc(choreRef, {
@@ -51,17 +53,24 @@ const Chore: React.FC = () => {
 		}
 	}
 
-	const finishChore = async (chore: any, id: any) => {
+	const finishChore = async (chore: any, id: string) => {
 		if (chore.shared) {
+			console.log('chore is marked as shared');
+			
+			return;
 			// TODO: If the chore "shared" then open a dialog to allow the user to submit a photo of the chore being done.
 		}
-		if (chore.repeated) {
+		else if (chore.repeated) {
+			console.log('chore is marked as repeated');
+			return;
 			// TODO: If the chore is reoccurring, update the date to the next date instead of deleting it.
 		}
-		if (!chore.repeated) {
-			const choreRef = doc(firestore, 'chores', id)
+		else if (!chore.shared && !chore.repeated) {
+			console.log('chore is not shared or repeated');
+			const choreRef = doc(firestore, 'chores', id);
+			console.log(chore);
 			await updateDoc(choreRef, {
-				isDone: !chore?.status,
+				isDone: !chore.isDone,
 			})
 			console.log('chore finished')
 		}
@@ -118,14 +127,13 @@ const Chore: React.FC = () => {
 
 	const getChores = async () => {
 		setLoading(true)
-		console.log('currentUser', currentUser)
+		// console.log('currentUser', currentUser)
 
 		if (!currentUser?.uid) {
 			console.log('no user')
 
 			await getChoresAndSetUser()
 		} else {
-			console.log('user')
 			await getChoresWithGlobalUser()
 		}
 		setLoading(false)
@@ -175,7 +183,7 @@ const Chore: React.FC = () => {
 		)
 	}
 
-	if (allChoresAreDone === 0) {
+	if (allChoresAreDone === user_chores.length && !oldChores) {
 		return (
 			<Center h='100vh'>
 				<Stack>
