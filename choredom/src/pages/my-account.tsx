@@ -28,6 +28,7 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 	const [friendships, setFriendships] = React.useState<any[]>([])
 	const [tileLoading, setTileLoading] = React.useState<boolean>(false)
 	const [loading, setLoading] = React.useState<boolean>(false)
+	const [showFriendships, setShowFriendships] = React.useState<boolean>(false)
 
 	const getAccountInfo = async () => {
 		onAuthStateChanged(auth, async (user) => {
@@ -66,7 +67,6 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 	}
 
 	const getFriendships = async () => {
-		console.log('getFriendships')
 		setLoading(true)
 		try {
 			if (!gUser) {
@@ -79,11 +79,6 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 				throw new Error('Possibility of no friends.')
 			}
 			let requests = docSnap.data()?.friends
-			console.log('requests', requests)
-			console.log(
-				'requests',
-				requests.filter((r: any) => r.status !== 'pending')
-			)
 			setFriendships(requests.filter((r: any) => r.status !== 'pending'))
 		} catch (error) {
 			console.log('Error detected in getFriendships', error)
@@ -103,7 +98,6 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 		) {
 			return
 		}
-		const auth = getAuth()
 		if (auth.currentUser) {
 			if (
 				updated_user.email != gUser?.email ||
@@ -126,7 +120,7 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 					setCurrentUser(auth.currentUser)
 					const { uid, email, displayName } = auth.currentUser!
 					setgUser({ uid, email, displayName })
-					console.log('updated!')
+					console.log('display name updated!')
 				})
 				.catch((error) => {
 					console.log(error)
@@ -223,6 +217,10 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 		}
 	}
 
+	const toggleFriendships = () => {
+		setShowFriendships(!showFriendships)
+	}
+
 	return (
 		<Center h={'100vh'}>
 			<Stack direction={'column'}>
@@ -276,15 +274,16 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 				<Flex align='center' justify={'center'}>
 					<Button
 						colorScheme={'purple'}
-						w='50%'
-						outlineColor={'black'}
+						w='75%'
 						isLoading={loading}
-						onClick={() => getFriendships()}
+						onClick={() => {getFriendships();
+						toggleFriendships()}
+						}
 					>
-						View All Relationships
+						{ !showFriendships ? 'View All Relationships' : 'Hide Relationships'}
 					</Button>
 				</Flex>
-				{friendships.map((request, i) => (
+				{ showFriendships && friendships.map((request, i) => (
 					<RequestTile
 						key={i}
 						request={request}
