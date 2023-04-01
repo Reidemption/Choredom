@@ -60,6 +60,19 @@ export default function VerticallyCenter() {
 				throw new Error('Please fill out all marked fields')
 			}
 
+			const today = () => {
+				const date = new Date()
+				const day = date.getDate()
+				const month = date.getMonth() + 1
+				const year = date.getFullYear()
+				return `${year}-${month}-${day}`
+			}
+
+			// Make sure date is later than today
+			if (new Date(choreForm.choreDate) < new Date(today())) {
+				throw new Error('Please enter a date later than today')
+			}
+
 			const choreDocRef = await addDoc(collection(firestore, 'chores'), {
 				creatorId: user?.uid,
 				createdAt: serverTimestamp(),
