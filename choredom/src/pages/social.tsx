@@ -36,7 +36,7 @@ const Feed: React.FC<FeedProps> = () => {
 	return (
 		<Center>
 			<Box>
-				<Grid templateColumns='repeat(2, 1fr)' gap={6} mx={10}>
+				<Grid templateColumns='repeat(, 1fr)' gap={6}>
 					{socialTiles.map((tile) => (
 						<SocialTile key={tile.choreTitle} {...tile} />
 					))}
