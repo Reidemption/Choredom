@@ -16,12 +16,13 @@ import EditUserInfo from '../components/user/EditUserInfo'
 import RequestTile from '../components/RequestTile'
 import { runTransaction, doc, getDoc } from 'firebase/firestore'
 import { firestore } from '../firebase/clientApp'
+import EditProfilePicture from '../components/user/EditProfilePicture'
+import { getStorage, ref, uploadBytesResumable } from 'firebase/storage'
 
 const MyAccount: React.FC<MyAccountProps> = () => {
 	const [loaded, setLoaded] = React.useState(true)
 	const [gUser, setgUser] = useRecoilState(userState)
 	const [currentUser, setCurrentUser] = React.useState<any>(null)
-	const [edit, setEdit] = React.useState<boolean>(false)
 	const router = useRouter()
 	const auth = getAuth()
 	const [error, setError] = React.useState<string>('')
@@ -38,10 +39,10 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 					return
 				}
 				const { uid, email, displayName } = user!
-				console.log(user)
+				// console.log(user)
 				setgUser({ uid, email, displayName })
 				setCurrentUser(user)
-				console.log('currentUser', currentUser)
+				// console.log('currentUser', currentUser)
 
 				setLoaded(false)
 			} catch (error) {
@@ -62,8 +63,14 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 		router.push('/')
 	}
 
-	const updateProfilePicture = () => {
-		console.log('update profile picture')
+	const updateProfilePicture = (file: any) => {
+		const storage = getStorage()
+		console.log('file', file);
+		
+		
+		const storageRef = ref(storage, `/files/${file.name}`)
+
+		const uploadTask = uploadBytesResumable(storageRef, file)
 	}
 
 	const getFriendships = async () => {
@@ -227,21 +234,7 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 				<Flex border={'2px'} borderColor='black' p='2'>
 					<Stack direction='row' mb='4' mt='2'>
 						<Stack direction='column' alignItems={'center'}>
-							<Avatar
-								size='md'
-								name='User Avatar'
-								src='/avatar_placeholder.jpg'
-								onClick={() => updateProfilePicture()}
-							/>
-							<Text
-								align={'center'}
-								as='i'
-								style={{ cursor: 'pointer' }}
-								color='blue.500'
-								w='10vh'
-							>
-								Update Profile Picture
-							</Text>
+							<EditProfilePicture handleUpdatePicture={ updateProfilePicture } />
 						</Stack>
 						<Stack direction='column' px='3'>
 							{!currentUser?.displayName && (
@@ -276,23 +269,25 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 						colorScheme={'purple'}
 						w='75%'
 						isLoading={loading}
-						onClick={() => {getFriendships();
-						toggleFriendships()}
-						}
+						onClick={() => {
+							getFriendships()
+							toggleFriendships()
+						}}
 					>
-						{ !showFriendships ? 'View All Relationships' : 'Hide Relationships'}
+						{!showFriendships ? 'View All Relationships' : 'Hide Relationships'}
 					</Button>
 				</Flex>
-				{ showFriendships && friendships.map((request, i) => (
-					<RequestTile
-						key={i}
-						request={request}
-						rejectRequest={rejectRequest}
-						acceptRequest={acceptRequest}
-						loading={tileLoading}
-						uid={gUser?.uid}
-					/>
-				))}
+				{showFriendships &&
+					friendships.map((request, i) => (
+						<RequestTile
+							key={i}
+							request={request}
+							rejectRequest={rejectRequest}
+							acceptRequest={acceptRequest}
+							loading={tileLoading}
+							uid={gUser?.uid}
+						/>
+					))}
 			</Stack>
 		</Center>
 	)
