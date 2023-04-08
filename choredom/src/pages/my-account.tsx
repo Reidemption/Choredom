@@ -11,6 +11,8 @@ import { useRouter } from 'next/router'
 import { Avatar, AvatarBadge, AvatarGroup } from '@chakra-ui/react'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { userState } from '../atom/atoms'
+import Link from 'next/link'
+
 type MyAccountProps = {}
 import EditUserInfo from '../components/user/EditUserInfo'
 import RequestTile from '../components/RequestTile'
@@ -35,8 +37,7 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 		onAuthStateChanged(auth, async (user) => {
 			try {
 				if (!user) {
-					router.push('/')
-					return
+					throw new Error ('User not found. Please login.')
 				}
 				const { uid, email, displayName } = user!
 				// console.log(user)
@@ -226,6 +227,17 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 
 	const toggleFriendships = () => {
 		setShowFriendships(!showFriendships)
+	}
+
+	if (!currentUser) {
+		return (
+			<Center h={'100vh'}>
+				<Text fontSize={'xl'} color={'blue.400'}>
+					<Link href='/'>Login&nbsp;</Link>
+				</Text>
+				<Text fontSize='xl'> to view account details.</Text>
+			</Center>
+		)
 	}
 
 	return (
