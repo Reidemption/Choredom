@@ -26,6 +26,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { useRecoilState } from 'recoil'
 import { userState } from '../atom/atoms'
 import Link from 'next/link'
+import AddPhotoModal from '../components/chore/AddPhoto'
 
 const Chore: React.FC = () => {
 	const [currentUser, setCurrentUser] = useRecoilState(userState)
@@ -57,8 +58,8 @@ const Chore: React.FC = () => {
 		if (chore.shared) {
 			console.log('chore is marked as shared');
 			
-			return;
 			// TODO: If the chore "shared" then open a dialog to allow the user to submit a photo of the chore being done.
+			return;
 		}
 		else if (chore.repeated) {
 			console.log('chore is marked as repeated');
