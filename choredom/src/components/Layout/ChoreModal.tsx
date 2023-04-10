@@ -57,7 +57,7 @@ export default function VerticallyCenter() {
 		try {
 			if (formError) setFormError('')
 			if (!choreForm.choreName || !choreForm.choreDate) {
-				throw new Error('Please fill out all marked fields')
+				throw new Error('Please fill out all starred fields')
 			}
 
 			const today = () => {
@@ -85,7 +85,7 @@ export default function VerticallyCenter() {
 				shared: choreForm.shared,
 				isDone: false,
 			})
-			console.log('Document written with ID: ', choreDocRef.id)
+			// console.log('Document written with ID: ', choreDocRef.id)
 			onClose()
 			setLoading(false)
 			if (router.pathname === '/chores') {
@@ -93,7 +93,7 @@ export default function VerticallyCenter() {
 			}
 		} catch (error: any) {
 			console.error('handleCreateChore error:', error)
-			setFormError('handleCreateChore error:' + error.message)
+			setFormError(error.message)
 		}
 		setLoading(false)
 	}
