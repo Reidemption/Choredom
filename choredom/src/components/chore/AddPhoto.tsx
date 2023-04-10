@@ -21,19 +21,41 @@ import {
 	IconButton,
 } from '@chakra-ui/react'
 import { useState } from 'react'
-import { getStorage, ref } from 'firebase/storage'
+import { getStorage, ref, uploadBytes } from 'firebase/storage'
 
-const AddPhotoModal: React.FC<any> = ({}) => {
+const AddPhotoModal: React.FC<any> = ({chore}) => {
 	const { isOpen, onOpen, onClose } = useDisclosure()
 	const storage = getStorage()
-	const storageRef = ref(storage)
 
 	const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 	}
 
+	const [selectedImage, setSelectedImage] = useState(null)
+
+	const handleImageChange = (e: any) => {
+		setSelectedImage(e.target.files[0])
+	}
+
+	const handleUploadImage = () => {
+		const timestamp = Date.now()
+
+		const imageRef = ref(storage, `${timestamp}.jpg`)
+
+		if (selectedImage) {
+			uploadBytes(imageRef, selectedImage).then((snapshot) => {
+				console.log('Uploaded a blob or file!')
+			})
+		}
+	}
+
 	return (
 		<Flex>
+			<Checkbox
+				w='10%'
+				isChecked={chore.checked}
+				onChange={() => onOpen()}
+			></Checkbox>
 			<Modal onClose={onClose} isOpen={isOpen}>
 				<ModalOverlay />
 				<form onSubmit={onSubmit}>
@@ -41,19 +63,12 @@ const AddPhotoModal: React.FC<any> = ({}) => {
 						<ModalHeader>Add Photo to Shared Chore</ModalHeader>
 						<ModalCloseButton />
 						<ModalBody>
-							<Stack direction={'column'} spacing={2}></Stack>
+							<Input type='file' onChange={handleImageChange} />
+							<Button onClick={handleUploadImage}>Upload Image</Button>
 						</ModalBody>
 						<ModalFooter>
 							<Button colorScheme={'purple'} type='submit'>
 								Update Chore
-							</Button>
-							<Button
-								ml={3}
-								variant={'outline'}
-								colorScheme={'red'}
-								type='submit'
-							>
-								Delete Chore
 							</Button>
 							<Spacer />
 							<Button onClick={onClose}>Close</Button>
