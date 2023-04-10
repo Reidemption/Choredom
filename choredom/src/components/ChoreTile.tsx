@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react'
 import React from 'react'
 import EditChoreModal from './chore/EditChore'
+import AddPhotoModal from './chore/AddPhoto'
 
 // TODO: Update the chore as done after 2 seconds?
 
@@ -46,11 +47,15 @@ const ChoreTile: React.FC<any> = ({
 			bg={'white'}
 		>
 			<Flex w='100%' m={5}>
-				<Checkbox
-					w='10%'
-					isChecked={checked}
-					onChange={() => finishChore(props, props.id)}
-				></Checkbox>
+				{props.shared ? (
+					<AddPhotoModal chore={ props } />
+				): (
+						<Checkbox
+							w='10%'
+							isChecked={checked}
+							onChange={() => finishChore(props, props.id)}
+						></Checkbox>
+				)}
 				<Spacer />
 				<HStack spacing={3} w='35%'>
 					<VStack spacing={0} align='start'>
