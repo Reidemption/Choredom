@@ -63,8 +63,6 @@ const SignUp: React.FC = () => {
       setFormError("Password must be at least 8 characters.");
       return;
     }
-    console.log(signUpForm.password);
-    console.log(signUpForm.confirmPassword);
     createUserWithEmailAndPassword(signUpForm.email, signUpForm.password);
 
     if (!error) {

@@ -35,8 +35,6 @@ const Chore: React.FC = () => {
 	const [oldChores, setOldChores] = useState<boolean>(false)
 
 	const editChore = async (chore: any, id: any) => {
-		console.log('edit chore called');
-		console.log('chore:',chore, 'id:', id);
 		if (id) {
 			const choreRef = doc(firestore, 'chores', id)
 			await updateDoc(choreRef, {
@@ -67,13 +65,10 @@ const Chore: React.FC = () => {
 			// TODO: If the chore is reoccurring, update the date to the next date instead of deleting it.
 		}
 		else if (!chore.shared && !chore.repeated) {
-			console.log('chore is not shared or repeated');
 			const choreRef = doc(firestore, 'chores', id);
-			console.log(chore);
 			await updateDoc(choreRef, {
 				isDone: !chore.isDone,
 			})
-			console.log('chore finished')
 		}
 		getChores()
 	}
@@ -85,12 +80,10 @@ const Chore: React.FC = () => {
 				where('creatorId', '==', currentUser?.uid)
 			)
 			const choreDocs = await getDocs(choreQuery)
-			console.log('choreDocs', choreDocs)
 			const choreData = choreDocs.docs.map((doc) => ({
 				...doc.data(),
 				id: doc.id,
 			}))
-			console.log('choreData', choreData)
 			setUserChores(choreData)
 		} catch (error) {
 			console.error('getChores error:', error)
@@ -108,7 +101,6 @@ const Chore: React.FC = () => {
 					where('creatorId', '==', user?.uid)
 				)
 				const choreDocs = await getDocs(choreQuery)
-				console.log('choreDocs', choreDocs)
 
 				const choreData = choreDocs.docs.map((doc) => ({
 					...doc.data(),

@@ -40,10 +40,8 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 					throw new Error ('User not found. Please login.')
 				}
 				const { uid, email, displayName } = user!
-				// console.log(user)
 				setgUser({ uid, email, displayName })
 				setCurrentUser(user)
-				// console.log('currentUser', currentUser)
 
 				setLoaded(false)
 			} catch (error) {
@@ -59,14 +57,12 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 	}, [])
 
 	const logout = () => {
-		console.log('logout')
 		signOut(auth)
 		router.push('/')
 	}
 
 	const updateProfilePicture = (file: any) => {
 		const storage = getStorage()
-		console.log('file', file);
 		
 		
 		const storageRef = ref(storage, `/files/${file.name}`)
@@ -118,7 +114,7 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 						setgUser({ uid, email, displayName })
 					})
 					.catch((error) => {
-						console.log(error)
+						console.error(error)
 					})
 			}
 			updateProfile(auth.currentUser, {
@@ -128,10 +124,9 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 					setCurrentUser(auth.currentUser)
 					const { uid, email, displayName } = auth.currentUser!
 					setgUser({ uid, email, displayName })
-					console.log('display name updated!')
 				})
 				.catch((error) => {
-					console.log(error)
+					console.error(error)
 				})
 		}
 	}

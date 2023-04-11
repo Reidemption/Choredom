@@ -62,9 +62,7 @@ export default function Home() {
 			.then((userCredential) => {
 				if (userCredential) {
 					// Signed in
-					console.log(typeof userCredential.user, userCredential.user)
 					const { uid, email, displayName } = userCredential.user!
-					console.log(uid, email, displayName)
 					setCurrentUser({ uid, email, displayName })
 					// ...
 					router.push('/chores')
@@ -73,8 +71,8 @@ export default function Home() {
 			.catch((error) => {
 				const errorCode = error.code
 				const errorMessage = error.message
-				console.log('errorCode', errorCode)
-				console.log('errorMessage', errorMessage)
+				console.error('errorCode', errorCode)
+				console.error('errorMessage', errorMessage)
 			})
 		// TODO: need to make sure a user is presented.
 		// if (!error) {
