@@ -8,17 +8,10 @@ import {
 	ModalCloseButton,
 	Button,
 	Checkbox,
-	FormControl,
-	FormLabel,
 	Input,
-	Select,
 	Spacer,
-	Stack,
-	Textarea,
 	useDisclosure,
 	Flex,
-	Icon,
-	IconButton,
 } from '@chakra-ui/react'
 import { useState } from 'react'
 import { getStorage, ref, uploadBytes } from 'firebase/storage'
@@ -45,6 +38,7 @@ const AddPhotoModal: React.FC<any> = ({chore}) => {
 		if (selectedImage) {
 			uploadBytes(imageRef, selectedImage).then((snapshot) => {
 				console.log('Uploaded a blob or file!')
+				onClose()
 			})
 		}
 	}
@@ -58,23 +52,24 @@ const AddPhotoModal: React.FC<any> = ({chore}) => {
 			></Checkbox>
 			<Modal onClose={onClose} isOpen={isOpen}>
 				<ModalOverlay />
-				<form onSubmit={onSubmit}>
 					<ModalContent maxW='40rem'>
 						<ModalHeader>Add Photo to Shared Chore</ModalHeader>
 						<ModalCloseButton />
 						<ModalBody>
 							<Input type='file' onChange={handleImageChange} />
-							<Button onClick={handleUploadImage}>Upload Image</Button>
 						</ModalBody>
 						<ModalFooter>
-							<Button colorScheme={'purple'} type='submit'>
-								Update Chore
+							<Button
+								colorScheme={'purple'}
+								type='submit'
+								onClick={handleUploadImage}
+							>
+								Upload Image
 							</Button>
 							<Spacer />
 							<Button onClick={onClose}>Close</Button>
 						</ModalFooter>
 					</ModalContent>
-				</form>
 			</Modal>
 		</Flex>
 	)
