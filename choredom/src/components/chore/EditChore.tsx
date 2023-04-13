@@ -41,8 +41,8 @@ const EditChoreModal: React.FC<any> = ({
 		Location: props.Location,
 		Frequency: props.Frequency,
 		Description: props.Description,
-		isDone: false,
-		shared: false,
+		isDone: props.isDone,
+		shared: props.shared,
 	})
 
 	const resetChoreForm = () => {
