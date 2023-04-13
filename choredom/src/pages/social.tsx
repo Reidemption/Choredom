@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import SocialTile from '@/src/components/SocialTile'
-import { Box, Center, Grid, Text } from '@chakra-ui/react'
+import { Box, Center, Grid, Text, useMediaQuery } from '@chakra-ui/react'
 import SocialTileProps from '@/src/interfaces/SocialTileInterface'
 import { doc, getDoc } from 'firebase/firestore'
 import {auth, firestore} from '@/src/firebase/clientApp'
@@ -13,6 +13,8 @@ const Feed: React.FC<any> = () => {
 	const [gUser, setgUser] = useRecoilState(userState)
 	const [shared_chores, setSharedChores] = useState<any>([])
 	const auth = getAuth()
+  const [isSmallScreen] = useMediaQuery('(max-width: 768px)')
+
 
 	const checkUserInfo = async () => {
 		onAuthStateChanged(auth, async (user) => {
@@ -109,13 +111,20 @@ const Feed: React.FC<any> = () => {
 	}
 	return (
 		<Center>
-			<Grid templateColumns='repeat(, 1fr)' gap={6}>
-				{shared_chores.map((tile : any) => {
-					return (
-						<SocialTile key={tile.id} props={tile} />
-					)
-				})}
-			</Grid>
+			{isSmallScreen && (
+				<Grid templateColumns='repeat(, 1fr)' gap={6}>
+					{shared_chores.map((tile: any) => {
+						return <SocialTile key={tile.id} props={tile} />
+					})}
+				</Grid>
+			)}
+			{!isSmallScreen && (
+				<Grid templateColumns='repeat(2, 1fr)' gap={6}>
+					{shared_chores.map((tile: any) => {
+						return <SocialTile key={tile.id} props={tile} />
+					})}
+				</Grid>
+			)}
 		</Center>
 	)
 }
