@@ -74,15 +74,10 @@ const Feed: React.FC<any> = () => {
 					newSharedChores.push(...sharedChores)
 				}
 			}
-			console.log('newSharedChores', newSharedChores)
-			// There is an issue here...
-			// setSharedChores([...newSharedChores])
-			console.log('shared_chores', shared_chores)
 
 			const sortedChores = newSharedChores.sort(
 				(a: any, b: any) => b.finishedDate - a.finishedDate
 			)
-			console.log(sortedChores)
 			setSharedChores([...sortedChores])
 			// console.log('shared_chores', shared_chores)
 
