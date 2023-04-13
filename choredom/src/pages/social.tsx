@@ -11,7 +11,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 
 const Feed: React.FC<any> = () => {
 	const [gUser, setgUser] = useRecoilState(userState)
-	const [shared_chores, setSharedChores] = useState<any[]>([])
+	const [shared_chores, setSharedChores] = useState<any>([])
 	const auth = getAuth()
 
 	const checkUserInfo = async () => {
@@ -45,7 +45,8 @@ const Feed: React.FC<any> = () => {
 		}
 	}
 	
-	const getSharedChores = async (id:string, friends: any) => {
+	const getSharedChores = async (id: string, friends: any) => {
+		// console.log('shared chores', friends);
 		try {
 			if (!id) {
 				throw new Error('User error. Try again later.')
@@ -54,24 +55,34 @@ const Feed: React.FC<any> = () => {
 				throw new Error('No friends found. Please add friends.')
 			}
 			 const newSharedChores = []
-				for (const friend of friends) {
-					const sharedChoresRef = doc(
-						firestore,
-						'sharedChores',
-						friend.friend_id
-					)
-					const docSnap = await getDoc(sharedChoresRef)
-					if (!docSnap.exists()) {
-						break
-					}
-					const sharedChores = docSnap.data().sharedChores // array of objects (shared chores with the user)
-					
-					if (sharedChores) {
-						newSharedChores.push(...sharedChores)
-					}
+			for (const friend of friends) {
+				console.log(friend);
+				const sharedChoresRef = doc(
+					firestore,
+					'sharedChores',
+					friend.friend_id
+				)
+				const docSnap = await getDoc(sharedChoresRef)
+				if (!docSnap.exists()) {
+					console.log('breaking here');
+					return
 				}
+				const sharedChores = docSnap.data().sharedChores // array of objects? (shared chores with the user)
+				if (sharedChores) {
+					newSharedChores.push(...sharedChores)
+				}
+			}
+			console.log('newSharedChores', newSharedChores)
+			// There is an issue here...
+			// setSharedChores([...newSharedChores])
+			console.log('shared_chores', shared_chores)
 
-				setSharedChores([...newSharedChores])
+			const sortedChores = newSharedChores.sort(
+				(a: any, b: any) => b.finishedDate - a.finishedDate
+			)
+			console.log(sortedChores)
+			setSharedChores([...sortedChores])
+			// console.log('shared_chores', shared_chores)
 
 		} catch (error) {
 			console.error('Error detected in getSharedChores:', error)
@@ -99,7 +110,7 @@ const Feed: React.FC<any> = () => {
 	return (
 		<Center>
 			<Grid templateColumns='repeat(, 1fr)' gap={6}>
-				{shared_chores.map((tile) => {
+				{shared_chores.map((tile : any) => {
 					return (
 						<SocialTile key={tile.id} props={tile} />
 					)
