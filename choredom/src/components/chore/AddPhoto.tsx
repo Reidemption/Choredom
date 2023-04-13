@@ -66,6 +66,7 @@ const AddPhotoModal: React.FC<any> = ({chore}) => {
 		const sharedChoreRef = doc(firestore, 'sharedChores', currentUser!.uid)
 		const sharedChoreSearch = await transaction.get(sharedChoreRef)
 		interface sc {
+			id: string,
 			finishedDate: Date,
 			title: string,
 			caption: string,
@@ -73,6 +74,7 @@ const AddPhotoModal: React.FC<any> = ({chore}) => {
 			imageAlt?: string,
 		}
 		let sharedChore = {
+			id: chore.id,
 			finishedDate: new Date(),
 			title: chore.Name,
 			caption: caption, //check this over

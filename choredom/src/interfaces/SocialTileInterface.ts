@@ -1,7 +1,8 @@
 export default interface SocialTileProps {
-  image?: string;
-  imageAlt?: string;
-  finishedDate: string;
-  choreTitle: string;
-  choreStory?: string;
+	id: string
+	finishedDate: string
+	title: string
+	caption: string
+	image?: string
+	imageAlt?: string
 }

@@ -11,93 +11,77 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 
 const Feed: React.FC<any> = () => {
 	const [gUser, setgUser] = useRecoilState(userState)
-	const [friends, setFriends] = useState([])
-	const [shared_chores, setSharedChores] = useState([])
+	const [shared_chores, setSharedChores] = useState<any[]>([])
 	const auth = getAuth()
-	const user = auth.currentUser
 
-	const getFriends = async () => { 
-		console.log('Getting friends...')
+	const checkUserInfo = async () => {
+		onAuthStateChanged(auth, async (user) => {
+			try {
+				if (!user) {
+					throw new Error('User not found. Please login.')
+				}
+				const friends = await getFriends(user.uid)
+				await getSharedChores(user.uid, friends)
+			} catch (error) {
+				console.error(error)
+			}
+		})
+	}
+
+	const getFriends = async (id: string) => { 
 		try {
-			if (!user) {
+			if (!id) {
 				throw new Error('User error. Try again later.')
 			}
-			const friendsRef = doc(firestore, 'friends', user.uid)
+			const friendsRef = doc(firestore, 'friends', id)
 			const docSnap = await getDoc(friendsRef)
 			if (!docSnap.exists()) {
 				throw new Error('Possibility of no friends. No document was found.')
 			}
 			let requests = docSnap.data()?.friends
-			setFriends(requests.filter((r: any) => r.status === 'accepted'))
 			return requests.filter((r: any) => r.status === 'accepted')
 		} catch (error) {
-			console.log('Error detected in getFriends:', error)
+			console.error('Error detected in getFriends:', error)
 		}
 	}
 	
-	const getSharedChores = async () => {
-		console.log('Getting shared chores...')
+	const getSharedChores = async (id:string, friends: any) => {
 		try {
-			if (!user) {
+			if (!id) {
 				throw new Error('User error. Try again later.')
 			}
-			console.log('friends:', friends)
 			if (friends.length === 0) {
 				throw new Error('No friends found. Please add friends.')
 			}
-			friends.forEach(async (friend: any) => {
-				const sharedChoresRef = doc(firestore, 'sharedChores', friend.friend_id)
-				const docSnap = await getDoc(sharedChoresRef)
-				if (!docSnap.exists()) {
-					throw new Error('Possibility of no shared chores. No document was found.')
+			 const newSharedChores = []
+				for (const friend of friends) {
+					const sharedChoresRef = doc(
+						firestore,
+						'sharedChores',
+						friend.friend_id
+					)
+					const docSnap = await getDoc(sharedChoresRef)
+					if (!docSnap.exists()) {
+						break
+					}
+					const sharedChores = docSnap.data().sharedChores // array of objects (shared chores with the user)
+					
+					if (sharedChores) {
+						newSharedChores.push(...sharedChores)
+					}
 				}
-				let sharedChores = docSnap.data()
-				console.log('sharedChores', sharedChores)
-				return
-				let temp_array;
-				if (sharedChores) {
-					temp_array = shared_chores.push(sharedChores)
-				}
-				else {
-					temp_array = shared_chores
-				}
-				setSharedChores(temp_array)
-			})
-			const friendsRef = doc(firestore, 'shared', user.uid)
-			const docSnap = await getDoc(friendsRef)
-			if (!docSnap.exists()) {
-				throw new Error('Possibility of no friends. No document was found.')
-			}
-			let requests = docSnap.data()?.friends
-			setFriends(requests.filter((r: any) => r.status === 'accepted'))
+
+				setSharedChores([...newSharedChores])
+
 		} catch (error) {
-			console.log('Error detected in getFriends:', error)
+			console.error('Error detected in getSharedChores:', error)
 		}
 	}
-
-	// const checkUserInfo = async () => {
-	// 	 onAuthStateChanged(auth, async (user) => {
-	// 			try {
-	// 				if (!user) {
-	// 					throw new Error('User not found. Please login.')
-	// 				}
-	// 				console.log(user);
-	// 				const { uid, email, displayName } = user!
-	// 				setgUser({ uid, email, displayName })
-	// 				return uid
-	// 			} catch (error) {
-	// 				console.error(error)
-	// 			}
-	// 	 })
-	//  }
 
 
 	useEffect(() => {
 		async function onLoad() {
-			console.log('onLoad');
-			console.log('user', user);
-			await getFriends()
-			await getSharedChores()
+			await checkUserInfo()
 		}
 		
 		onLoad()
@@ -112,17 +96,17 @@ const Feed: React.FC<any> = () => {
 			</Center>
 		)
 	}
-		return (
-			<Center>
-				<Box>
-					<Grid templateColumns='repeat(, 1fr)' gap={6}>
-						{shared_chores.map((tile) => (
-							<SocialTile key={tile.choreTitle} {...tile} />
-						))}
-					</Grid>
-				</Box>
-			</Center>
-		)
+	return (
+		<Center>
+			<Grid templateColumns='repeat(, 1fr)' gap={6}>
+				{shared_chores.map((tile) => {
+					return (
+						<SocialTile key={tile.id} props={tile} />
+					)
+				})}
+			</Grid>
+		</Center>
+	)
 }
 
 export default Feed
