@@ -48,13 +48,13 @@ const ChoreTile: React.FC<any> = ({
 		>
 			<Flex w='100%' m={5}>
 				{props.shared ? (
-					<AddPhotoModal chore={ props } />
-				): (
-						<Checkbox
-							w='10%'
-							isChecked={checked}
-							onChange={() => finishChore(props, props.id)}
-						></Checkbox>
+					<AddPhotoModal chore={props} />
+				) : (
+					<Checkbox
+						w='10%'
+						isChecked={checked}
+						onChange={() => finishChore(props, props.id)}
+					></Checkbox>
 				)}
 				<Spacer />
 				<HStack spacing={3} w='35%'>
