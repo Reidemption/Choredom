@@ -4,7 +4,7 @@ import { getStorage, ref, getDownloadURL } from 'firebase/storage'
 
 
 const ShowImage = () => {
-  const [imageURL, setImageURL] = useState(null);
+  const [imageURL, setImageURL] = useState('');
 	const storage = getStorage()
 
 
@@ -19,7 +19,7 @@ const ShowImage = () => {
 		})
   }, []);
 
-  if (!imageURL) {
+  if (imageURL === '') {
     return <p>Loading...</p>;
   }
 
