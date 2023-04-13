@@ -53,13 +53,7 @@ const Chore: React.FC = () => {
 	}
 
 	const finishChore = async (chore: any, id: string) => {
-		if (chore.shared) {
-			console.log('chore is marked as shared');
-			
-			// TODO: If the chore "shared" then open a dialog to allow the user to submit a photo of the chore being done.
-			return;
-		}
-		else if (chore.repeated) {
+		if (chore.repeated) {
 			console.log('chore is marked as repeated');
 			return;
 			// TODO: If the chore is reoccurring, update the date to the next date instead of deleting it.
