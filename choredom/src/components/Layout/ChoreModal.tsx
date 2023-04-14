@@ -21,6 +21,7 @@ import {
 	Spacer,
 	Select,
 	FormHelperText,
+	useToast,
 } from '@chakra-ui/react'
 import { FiEdit } from 'react-icons/fi'
 import { useState } from 'react'
@@ -37,6 +38,7 @@ import { useAuthState } from 'react-firebase-hooks/auth'
 import { useRouter } from 'next/router'
 
 export default function VerticallyCenter() {
+	const toast = useToast()
 	const router = useRouter()
 	const { isOpen, onOpen, onClose } = useDisclosure()
 	const [user] = useAuthState(auth)
@@ -86,6 +88,12 @@ export default function VerticallyCenter() {
 				isDone: false,
 			})
 			// console.log('Document written with ID: ', choreDocRef.id)
+			toast({
+				title: `Created chore ${choreForm.choreName}`,
+				status: 'success',
+				isClosable: true,
+				duration: 9000,
+			})
 			onClose()
 			setLoading(false)
 			if (router.pathname === '/chores') {
@@ -93,6 +101,12 @@ export default function VerticallyCenter() {
 			}
 		} catch (error: any) {
 			console.error('handleCreateChore error:', error)
+			toast({
+				title: `Error creating chore`,
+				status: 'error',
+				isClosable: true,
+				duration: 9000,
+			})
 			setFormError(error.message)
 		}
 		setLoading(false)

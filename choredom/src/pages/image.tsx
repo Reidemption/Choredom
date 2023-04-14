@@ -1,30 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Image } from '@chakra-ui/react';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage'
-
+import { CustomToast } from '../components/toast'
 
 const ShowImage = () => {
   const [imageURL, setImageURL] = useState('');
-	const storage = getStorage()
-
-
-  useEffect(() => {
-    const gsReference = ref(
-			storage,
-			'gs://choredom-fafe4.appspot.com/1681056368562.jpg'
-		)
-
-    getDownloadURL(gsReference).then((url) => {
-			setImageURL(url)
-		})
-  }, []);
-
-  if (imageURL === '') {
-    return <p>Loading...</p>;
-  }
+  const storage = getStorage()
+  const { addToast } = CustomToast()
 
   return (
-    <Image src={imageURL} alt='image from the user' />
+    <button onClick={() => { addToast({ message: 'sign in successful', type: 'success' }) }}>hello</button>
   );
 };
 
