@@ -3,7 +3,6 @@ import {
 	Center,
 	Flex,
 	Input,
-	Spacer,
 	Stack,
 	Text,
 } from '@chakra-ui/react'
@@ -12,31 +11,25 @@ import {
 	collection,
 	getDoc,
 	query,
-	updateDoc,
 	where,
 	doc,
-	setDoc,
 	runTransaction,
-	limit,
-	arrayUnion,
 	getDocs,
 } from 'firebase/firestore'
 import { firestore } from '../firebase/clientApp'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import RequestTile from '../components/RequestTile'
-import { log } from 'console'
+import { CustomToast } from '../components/toast'
+
 
 const Connect: React.FC = () => {
 	const [search, setSearch] = React.useState<string>('')
-	const [friendError, setFriendError] = React.useState<string>('')
-	const [friendSuccess, setFriendSuccess] = React.useState<string>('')
 	const [loading, setLoading] = React.useState<boolean>(false)
 	const [currentUser, setCurrentUser] = React.useState<any>(null)
 	const [requests, setRequests] = React.useState<any[]>([])
-	const [error, setError] = React.useState<string>('')
-	const [success, setSuccess] = React.useState<string>('')
 	const [tileLoading, setTileLoading] = React.useState<boolean>(false)
-	const [allRequests, setAllRequests] = React.useState<boolean>(false)
+  const { addToast } = CustomToast()
+
 
 	const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		setLoading(true)
@@ -78,7 +71,6 @@ const Connect: React.FC = () => {
 				}
 				if (!friendDocSearch.exists() || !friendDocSearch.data()?.friends) {
 					// If the document doesn't exist, create it.
-					console.log('creating frienddoc friends array field')
 					transaction.set(friendDocRef, { friends: [friendDocData] })
 				} else {
 					transaction.update(friendDocRef, {
@@ -88,7 +80,6 @@ const Connect: React.FC = () => {
 
 				if (!submitterDoc.exists() || !submitterDoc.data()?.friends) {
 					// If the document doesn't exist, create it.
-					console.log('creating submitter friends array field')
 					transaction.set(submitterDocRef, { friends: [docData] })
 				} else {
 					transaction.update(submitterDocRef, {
@@ -96,10 +87,9 @@ const Connect: React.FC = () => {
 					})
 				}
 			})
-
-			setFriendSuccess('Friend request sent!')
+			addToast({ message: 'Friend request sent!', type: 'success' })
 		} catch (error: any) {
-			setFriendError(error.message)
+			addToast({ message: error.message, type: 'error' })
 		}
 		setLoading(false)
 	}
@@ -144,7 +134,6 @@ const Connect: React.FC = () => {
 
 				if (!myDocSearch.exists() || !myDocSearch.data()?.friends) {
 					// If the document doesn't exist, throw an error.
-					console.log('Error finding document')
 					throw new Error("error finding friend's document")
 				}
 
@@ -191,13 +180,11 @@ const Connect: React.FC = () => {
 					friends: [...arr2],
 				})
 			})
+			addToast({ message: `Friend request ${rStatus}!`, type: 'success' })
 
-			setFriendSuccess(`Friend request ${rStatus}!`)
-			setTimeout(() => {
-				setFriendSuccess(``)
-			}, 1500)
 		} catch (error: any) {
-			setFriendError(error.message)
+			addToast({ message: error.message, type: 'error' })
+			console.error(error.message);
 		}
 	}
 
@@ -217,8 +204,9 @@ const Connect: React.FC = () => {
 				}
 				let requests = docSnap.data()?.friends
 				setRequests(requests)
-			} catch (error) {
-				console.log('Error detected in getRequests', error)
+			} catch (error: any) {
+				addToast({ message: error.message, type: 'error' })
+				console.error('Error detected in getRequests', error)
 			}
 		})
 		setLoading(false)
@@ -264,16 +252,6 @@ const Connect: React.FC = () => {
 								onChange={onChange}
 								px='2'
 							/>
-							{friendError && (
-								<Text textAlign={'center'} color={'red.500'}>
-									{friendError}
-								</Text>
-							)}
-							{friendSuccess && (
-								<Text textAlign={'center'} color={'green'}>
-									{friendSuccess}
-								</Text>
-							)}
 							<Button
 								mt='3'
 								w='100%'

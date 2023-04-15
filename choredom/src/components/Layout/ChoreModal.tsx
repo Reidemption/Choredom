@@ -87,7 +87,6 @@ export default function VerticallyCenter() {
 				shared: choreForm.shared,
 				isDone: false,
 			})
-			// console.log('Document written with ID: ', choreDocRef.id)
 			toast({
 				title: `Created chore ${choreForm.choreName}`,
 				status: 'success',
@@ -102,7 +101,7 @@ export default function VerticallyCenter() {
 		} catch (error: any) {
 			console.error('handleCreateChore error:', error)
 			toast({
-				title: `Error creating chore`,
+				title: error.message,
 				status: 'error',
 				isClosable: true,
 				duration: 9000,
@@ -114,7 +113,6 @@ export default function VerticallyCenter() {
 
 	const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-		console.log('submit')
 	}
 
 	const onChange = (
@@ -129,11 +127,9 @@ export default function VerticallyCenter() {
 	}
 
 	const onCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		console.log(e.target.checked)
 		setChoreForm({ ...choreForm, repeated: e.target.checked })
 	}
 	const onShareChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		console.log(e.target.checked)
 		setChoreForm({ ...choreForm, shared: e.target.checked })
 	}
 

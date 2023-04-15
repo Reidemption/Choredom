@@ -9,7 +9,7 @@ const ShowImage = () => {
   const { addToast } = CustomToast()
 
   return (
-    <button onClick={() => { addToast({ message: 'sign in successful', type: 'success' }) }}>hello</button>
+    <button onClick={() => { addToast({ message: 'Sign in Successful', type: 'success' }) }}>hello</button>
   );
 };
 

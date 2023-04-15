@@ -1,8 +1,6 @@
 import {
 	Box,
 	Center,
-	Flex,
-	Grid,
 	Stack,
 	Spinner,
 	Text,
@@ -10,7 +8,6 @@ import {
 } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import ChoreTile from '../components/ChoreTile'
-import ChoreProps from '../interfaces/ChoreTileInterface'
 import {
 	collection,
 	query,
@@ -18,21 +15,23 @@ import {
 	getDocs,
 	doc,
 	updateDoc,
-	orderBy,
 	deleteDoc,
 } from 'firebase/firestore'
-import { auth, firestore } from '../firebase/clientApp'
+import { firestore } from '../firebase/clientApp'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { useRecoilState } from 'recoil'
 import { userState } from '../atom/atoms'
 import Link from 'next/link'
-import AddPhotoModal from '../components/chore/AddPhoto'
+import { CustomToast } from '../components/toast'
+
 
 const Chore: React.FC = () => {
 	const [currentUser, setCurrentUser] = useRecoilState(userState)
 	const [user_chores, setUserChores] = useState<any[]>([])
 	const [loading, setLoading] = useState(false)
 	const [oldChores, setOldChores] = useState<boolean>(false)
+  const { addToast } = CustomToast()
+
 
 	const editChore = async (chore: any, id: any) => {
 		if (id) {
@@ -40,7 +39,11 @@ const Chore: React.FC = () => {
 			await updateDoc(choreRef, {
 				...chore,
 			})
+			addToast({ message: 'Chore Updated', type: 'success' })
 			getChores()
+		}
+		else {
+			addToast({ message: 'Error updating chore', type: 'error' })
 		}
 	}
 
@@ -48,13 +51,18 @@ const Chore: React.FC = () => {
 		if (id) {
 			const choreRef = doc(firestore, 'chores', id)
 			await deleteDoc(choreRef)
+			addToast({ message: 'Chore Deleted', type: 'success' })
 			getChores()
 		}
+		else {
+			addToast({ message: 'Error deleting chore', type: 'error' })
+		}
+
 	}
 
 	const finishChore = async (chore: any, id: string) => {
 		if (chore.repeated) {
-			console.log('chore is marked as repeated');
+			console.log('chore is marked as repeated \nThis is still a work in progress' );
 			return;
 			// TODO: If the chore is reoccurring, update the date to the next date instead of deleting it.
 		}
@@ -64,6 +72,7 @@ const Chore: React.FC = () => {
 				isDone: !chore.isDone,
 			})
 		}
+		addToast({ message: 'Chore Completed', type: 'success' })
 		getChores()
 	}
 
@@ -79,7 +88,8 @@ const Chore: React.FC = () => {
 				id: doc.id,
 			}))
 			setUserChores(choreData)
-		} catch (error) {
+		} catch (error: any) {
+			addToast({ message: error.message, type: 'error' })
 			console.error('getChores error:', error)
 		}
 	}
@@ -105,7 +115,8 @@ const Chore: React.FC = () => {
 						return new Date(b.Date).valueOf() - new Date(a.Date).valueOf()
 					})
 				)
-			} catch (error) {
+			} catch (error: any) {
+				addToast({ message: error.message, type: 'error' })
 				console.error('getChores error:', error)
 			}
 			setLoading(false)
@@ -114,10 +125,8 @@ const Chore: React.FC = () => {
 
 	const getChores = async () => {
 		setLoading(true)
-		// console.log('currentUser', currentUser)
 
 		if (!currentUser?.uid) {
-			console.log('no user')
 
 			await getChoresAndSetUser()
 		} else {

@@ -3,7 +3,7 @@ import { useToast } from '@chakra-ui/react'
 type setStatus = 'success' | 'info' | 'warning' | 'error'
 
 interface Itoast {
-	message: string
+	message: any
 	type: setStatus
 }
 

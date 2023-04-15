@@ -12,6 +12,8 @@ import { Avatar, AvatarBadge, AvatarGroup } from '@chakra-ui/react'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { userState } from '../atom/atoms'
 import Link from 'next/link'
+import { CustomToast } from '../components/toast'
+
 
 type MyAccountProps = {}
 import EditUserInfo from '../components/user/EditUserInfo'
@@ -32,6 +34,8 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 	const [tileLoading, setTileLoading] = React.useState<boolean>(false)
 	const [loading, setLoading] = React.useState<boolean>(false)
 	const [showFriendships, setShowFriendships] = React.useState<boolean>(false)
+  const { addToast } = CustomToast()
+
 
 	const getAccountInfo = async () => {
 		onAuthStateChanged(auth, async (user) => {
@@ -44,7 +48,8 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 				setCurrentUser(user)
 
 				setLoaded(false)
-			} catch (error) {
+			} catch (error : any) {
+				addToast({ message: error.message, type: 'error' })
 				console.error('myAccount error:', error)
 			}
 		})
@@ -58,6 +63,7 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 
 	const logout = () => {
 		signOut(auth)
+		addToast({ message: 'Sign Out Successful', type: 'success' })
 		router.push('/')
 	}
 
@@ -84,8 +90,9 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 			}
 			let requests = docSnap.data()?.friends
 			setFriendships(requests.filter((r: any) => r.status !== 'pending'))
-		} catch (error) {
-			console.log('Error detected in getFriendships', error)
+		} catch (error: any) {
+			addToast({ message: error.message, type: 'error' })
+			console.error('Error detected in getFriendships', error)
 		}
 		setLoading(false)
 	}
@@ -112,8 +119,10 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 						setCurrentUser(auth.currentUser)
 						const { uid, email, displayName } = auth.currentUser!
 						setgUser({ uid, email, displayName })
+						addToast({ message: 'Email updated', type: 'success' })
 					})
 					.catch((error) => {
+						addToast({ message: error.message, type: 'error' })
 						console.error(error)
 					})
 			}
@@ -124,13 +133,14 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 					setCurrentUser(auth.currentUser)
 					const { uid, email, displayName } = auth.currentUser!
 					setgUser({ uid, email, displayName })
+					addToast({ message: 'Display name updated', type: 'success' })
 				})
 				.catch((error) => {
+					addToast({ message: error.message, type: 'error' })
 					console.error(error)
 				})
 		}
 	}
-	const exist_requests = friendships.length > 0
 
 	const acceptRequest = async (req: any) => {
 		setTileLoading(true)
@@ -168,7 +178,6 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 
 				if (!myDocSearch.exists() || !myDocSearch.data()?.friends) {
 					// If the document doesn't exist, throw an error.
-					console.log('Error finding document')
 					throw new Error("error finding friend's document")
 				}
 
@@ -207,7 +216,7 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 							friend.status === req.status
 					)
 				if (index2 === -1) {
-					throw new Error('error finding friend request')
+					throw new Error('Error finding friend request')
 				}
 				let arr2 = [...submitterDoc.data()?.friends]
 				arr2[index2] = friendDocData
@@ -216,7 +225,8 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 				})
 			})
 		} catch (error: any) {
-			console.log(error)
+			addToast({ message: error.message, type: 'error' })
+			console.error(error)
 		}
 	}
 

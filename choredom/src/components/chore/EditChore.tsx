@@ -73,12 +73,10 @@ const EditChoreModal: React.FC<any> = ({
 	}
 
 	const onCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		console.log(e.target.checked)
 		setChoreForm({ ...choreForm, repeated: e.target.checked })
 	}
 
 	const onShareChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		console.log(e.target.checked)
 		setChoreForm({ ...choreForm, shared: e.target.checked })
 	}
 

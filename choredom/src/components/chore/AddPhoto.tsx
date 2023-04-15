@@ -35,7 +35,7 @@ const AddPhotoModal: React.FC<any> = ({chore}) => {
 
 	const handleUploadImage = async () => {
 		if (!currentUser) return
-		let timestamp = undefined;
+		let timestamp : number;
 
 		await runTransaction(firestore, async (transaction) => { 
 
@@ -45,7 +45,6 @@ const AddPhotoModal: React.FC<any> = ({chore}) => {
 					const imageRef = ref(storage, `${timestamp}.jpg`)
 			
 					uploadBytes(imageRef, selectedImage).then((snapshot) => {
-						console.log('Uploaded a blob or file!')
 					})
 				}
 				await handleShareChore(timestamp, transaction)
@@ -56,8 +55,6 @@ const AddPhotoModal: React.FC<any> = ({chore}) => {
 
 	const handleShareChore = async (timestamp : number | undefined, transaction: any) => {
 		if (!chore.shared) return
-		console.log('chore is marked as shared')
-		console.log(chore)
 
 		// Update the existing chore as finished
 		const choreRef = doc(firestore, 'chores', chore.id)
@@ -87,7 +84,6 @@ const AddPhotoModal: React.FC<any> = ({chore}) => {
 
 		if (!sharedChoreSearch.exists() || !sharedChoreSearch.data()?.sharedChores) {
 			// If the document doesn't exist, create it.
-			console.log('creating sharedChore doc array field')
 			transaction.set(sharedChoreRef, { sharedChores: [sharedChore] })
 		} else {
 			transaction.update(sharedChoreRef, {

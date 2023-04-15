@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import SocialTile from '@/src/components/SocialTile'
-import { Box, Center, Grid, Text, useMediaQuery } from '@chakra-ui/react'
-import SocialTileProps from '@/src/interfaces/SocialTileInterface'
+import { Center, Grid, Text, useMediaQuery } from '@chakra-ui/react'
 import { doc, getDoc } from 'firebase/firestore'
-import {auth, firestore} from '@/src/firebase/clientApp'
+import { firestore } from '@/src/firebase/clientApp'
 import { useRecoilState } from 'recoil'
 import { userState } from '../atom/atoms'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { CustomToast } from '../components/toast'
 
 
 const Feed: React.FC<any> = () => {
@@ -14,6 +14,7 @@ const Feed: React.FC<any> = () => {
 	const [shared_chores, setSharedChores] = useState<any>([])
 	const auth = getAuth()
   const [isSmallScreen] = useMediaQuery('(max-width: 768px)')
+  const { addToast } = CustomToast()
 
 
 	const checkUserInfo = async () => {
@@ -24,7 +25,8 @@ const Feed: React.FC<any> = () => {
 				}
 				const friends = await getFriends(user.uid)
 				await getSharedChores(user.uid, friends)
-			} catch (error) {
+			} catch (error: any) {
+				addToast({ message: error.message, type: 'error' })
 				console.error(error)
 			}
 		})
@@ -42,13 +44,13 @@ const Feed: React.FC<any> = () => {
 			}
 			let requests = docSnap.data()?.friends
 			return requests.filter((r: any) => r.status === 'accepted')
-		} catch (error) {
+		} catch (error: any) {
+			addToast({ message: error.message, type: 'error' })
 			console.error('Error detected in getFriends:', error)
 		}
 	}
 	
 	const getSharedChores = async (id: string, friends: any) => {
-		// console.log('shared chores', friends);
 		try {
 			if (!id) {
 				throw new Error('User error. Try again later.')
@@ -58,7 +60,6 @@ const Feed: React.FC<any> = () => {
 			}
 			 const newSharedChores = []
 			for (const friend of friends) {
-				console.log(friend);
 				const sharedChoresRef = doc(
 					firestore,
 					'sharedChores',
@@ -66,7 +67,6 @@ const Feed: React.FC<any> = () => {
 				)
 				const docSnap = await getDoc(sharedChoresRef)
 				if (!docSnap.exists()) {
-					console.log('breaking here');
 					return
 				}
 				const sharedChores = docSnap.data().sharedChores // array of objects? (shared chores with the user)
@@ -79,9 +79,9 @@ const Feed: React.FC<any> = () => {
 				(a: any, b: any) => b.finishedDate - a.finishedDate
 			)
 			setSharedChores([...sortedChores])
-			// console.log('shared_chores', shared_chores)
 
-		} catch (error) {
+		} catch (error: any) {
+			addToast({ message: error.message, type: 'error' })
 			console.error('Error detected in getSharedChores:', error)
 		}
 	}
