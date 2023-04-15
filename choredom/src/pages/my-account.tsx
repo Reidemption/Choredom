@@ -38,6 +38,13 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 	const storage = getStorage()
 	
 
+	const updateAvatar = (img: string) => {
+		const imageURL = img
+		const profilePicRef = ref(storage, imageURL)
+		getDownloadURL(profilePicRef).then((url) => {
+			setProfilePic(url)
+		})
+	}
 
 	const getAccountInfo = async () => {
 		onAuthStateChanged(auth, async (user) => {
@@ -49,20 +56,17 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 				setgUser({ uid, email, displayName })
 				setCurrentUser(user)
 
-				setLoaded(false)
 				if (!user.photoURL) {
+					setLoaded(false)
 					return
 				}
-				const imageURL = user.photoURL
-				const profilePicRef = ref(storage, imageURL)
-				getDownloadURL(profilePicRef).then((url) => {
-					setProfilePic(url)
-				})
+				updateAvatar(user.photoURL)
 				
 			} catch (error : any) {
 				addToast({ message: error.message, type: 'error' })
 				console.error('myAccount error:', error)
 			}
+			setLoaded(false)
 		})
 	}
 	useEffect(() => {
@@ -78,7 +82,7 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 		router.push('/')
 	}
 
-	const updateProfilePicture = (file: any) => {
+	const updateProfilePicture = async (file: any) => {
 
 		if (!file || !auth.currentUser) {
 			return
@@ -94,9 +98,12 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 			
 			updateProfile(auth.currentUser, {
 				photoURL: `gs://choredom-fafe4.appspot.com/avatar/${timestamp}.jpg`,
+			}).then(() => {
+				updateAvatar(`gs://choredom-fafe4.appspot.com/avatar/${timestamp}.jpg`)
+
 			})
 			addToast({ message: 'Avatar updated', type: 'success' })
-			getAccountInfo()
+			
 		} catch (error: any) {
 			addToast({ message: error.message, type: 'error' })
 			console.error('Error changing avatar', error)

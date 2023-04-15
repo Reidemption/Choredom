@@ -86,7 +86,6 @@ const EditProfilePicture: React.FC<any> = ({ handleUpdatePicture, avatar }) => {
 								colorScheme={'purple'}
 								type='submit'
 								onClick={() => {
-									handleUpdatePicture(file)
 									onClose()
 								}}
 							>
