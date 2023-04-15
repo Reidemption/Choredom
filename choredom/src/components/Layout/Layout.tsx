@@ -14,14 +14,9 @@ import {
 	BoxProps,
 	Spacer,
 	FlexProps,
-	Divider,
 } from '@chakra-ui/react'
 import {
-	FiHome,
 	FiTrendingUp,
-	FiCompass,
-	FiStar,
-	FiSettings,
 	FiMenu,
 	FiUser,
 } from 'react-icons/fi'
@@ -29,6 +24,7 @@ import { IconType } from 'react-icons'
 import VerticallyCenter from './ChoreModal'
 import { BsFillPersonPlusFill } from 'react-icons/bs'
 import { IoPerson } from 'react-icons/io5'
+import { useMediaQuery } from '@chakra-ui/media-query'
 
 interface LinkItemProps {
 	name: string
@@ -43,6 +39,7 @@ const LinkItems: Array<LinkItemProps> = [
 
 export default function SimpleSidebar({ children }: { children: ReactNode }) {
 	const { isOpen, onOpen, onClose } = useDisclosure()
+
 	return (
 		<Box minH='100vh' bg={useColorModeValue('gray.100', 'gray.900')}>
 			<SidebarContent
@@ -76,6 +73,8 @@ interface SidebarProps extends BoxProps {
 }
 
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
+  const [isSmallScreen] = useMediaQuery('(max-width: 768px)')
+
 	return (
 		<Box
 			bg={useColorModeValue('white', 'gray.900')}
@@ -105,7 +104,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 				_focus={{ boxShadow: 'none' }}
 			>
 				<Flex
-					bottom={4}
+					bottom={!isSmallScreen ? 4 : 20}
 					left={0}
 					position='absolute'
 					width={'90%'}
