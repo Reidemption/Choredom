@@ -17,15 +17,19 @@ import {
 import { useState } from 'react'
 import { getStorage, ref, uploadBytes } from 'firebase/storage'
 import { firestore } from '@/src/firebase/clientApp'
-import { doc, updateDoc, runTransaction } from 'firebase/firestore'
-import { useRecoilState } from 'recoil'
+import { doc, runTransaction } from 'firebase/firestore'
+import { useRecoilValue } from 'recoil'
 import { userState } from '@/src/atom/atoms'
+import { CustomToast } from '../toast'
+
 
 const AddPhotoModal: React.FC<any> = ({chore}) => {
 	const { isOpen, onOpen, onClose } = useDisclosure()
-	const [currentUser, setCurrentUser] = useRecoilState(userState)
+	const currentUser = useRecoilValue(userState)
 	const storage = getStorage()
 	const [caption, setCaption] = useState(chore.Description)
+  const { addToast } = CustomToast()
+
 
 	const [selectedImage, setSelectedImage] = useState(null)
 
@@ -37,18 +41,23 @@ const AddPhotoModal: React.FC<any> = ({chore}) => {
 		if (!currentUser) return
 		let timestamp : number;
 
-		await runTransaction(firestore, async (transaction) => { 
-
-				if (selectedImage) {
-					timestamp = Date.now()
-		
-					const imageRef = ref(storage, `${timestamp}.jpg`)
+		try {
+			await runTransaction(firestore, async (transaction) => { 
+	
+					if (selectedImage) {
+						timestamp = Date.now()
 			
-					uploadBytes(imageRef, selectedImage).then((snapshot) => {
-					})
-				}
-				await handleShareChore(timestamp, transaction)
-		 })
+						const imageRef = ref(storage, `${timestamp}.jpg`)
+				
+						uploadBytes(imageRef, selectedImage).then((snapshot) => {
+						})
+					}
+					await handleShareChore(timestamp, transaction)
+			 })
+		} catch (error: any) {
+			addToast({ message: error.message, type: 'error' })
+			console.error("Error sharing chore: ", error)
+		}
 
 		onClose()
 	}
