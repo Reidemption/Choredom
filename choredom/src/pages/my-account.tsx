@@ -21,7 +21,7 @@ import RequestTile from '../components/RequestTile'
 import { runTransaction, doc, getDoc } from 'firebase/firestore'
 import { firestore } from '../firebase/clientApp'
 import EditProfilePicture from '../components/user/EditProfilePicture'
-import { getStorage, ref, uploadBytesResumable } from 'firebase/storage'
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
 
 const MyAccount: React.FC<MyAccountProps> = () => {
 	const [loaded, setLoaded] = React.useState(true)
@@ -29,12 +29,14 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 	const [currentUser, setCurrentUser] = React.useState<any>(null)
 	const router = useRouter()
 	const auth = getAuth()
-	const [error, setError] = React.useState<string>('')
 	const [friendships, setFriendships] = React.useState<any[]>([])
 	const [tileLoading, setTileLoading] = React.useState<boolean>(false)
 	const [loading, setLoading] = React.useState<boolean>(false)
 	const [showFriendships, setShowFriendships] = React.useState<boolean>(false)
-  const { addToast } = CustomToast()
+	const [profilePic, setProfilePic] = React.useState<string>('')
+	const { addToast } = CustomToast()
+	const storage = getStorage()
+	
 
 
 	const getAccountInfo = async () => {
@@ -48,6 +50,15 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 				setCurrentUser(user)
 
 				setLoaded(false)
+				if (!user.photoURL) {
+					return
+				}
+				const imageURL = user.photoURL
+				const profilePicRef = ref(storage, imageURL)
+				getDownloadURL(profilePicRef).then((url) => {
+					setProfilePic(url)
+				})
+				
 			} catch (error : any) {
 				addToast({ message: error.message, type: 'error' })
 				console.error('myAccount error:', error)
@@ -68,12 +79,28 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 	}
 
 	const updateProfilePicture = (file: any) => {
-		const storage = getStorage()
-		
-		
-		const storageRef = ref(storage, `/files/${file.name}`)
 
-		const uploadTask = uploadBytesResumable(storageRef, file)
+		if (!file || !auth.currentUser) {
+			return
+		}
+		try {
+			const timestamp = Date.now()
+	
+			const avatarRef = ref(storage, `/avatar/${timestamp}.jpg`)
+	
+			uploadBytes(avatarRef, file).then((snapshot) => {
+				console.log(snapshot)
+			})
+			
+			updateProfile(auth.currentUser, {
+				photoURL: `gs://choredom-fafe4.appspot.com/avatar/${timestamp}.jpg`,
+			})
+			addToast({ message: 'Avatar updated', type: 'success' })
+			getAccountInfo()
+		} catch (error: any) {
+			addToast({ message: error.message, type: 'error' })
+			console.error('Error changing avatar', error)
+		}
 	}
 
 	const getFriendships = async () => {
@@ -100,7 +127,7 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 	const updateUser = (updated_user: any) => {
 		// TODO: ensure there is a valid email??
 		if (updated_user.email === '' || !updated_user.email.includes('@')) {
-			setError('Valid email is required')
+			addToast({ message: 'Valid email required', type: 'error' })
 			return
 		}
 		if (
@@ -251,7 +278,10 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 				<Flex border={'2px'} borderColor='black' p='2'>
 					<Stack direction='row' mb='4' mt='2'>
 						<Stack direction='column' alignItems={'center'}>
-							<EditProfilePicture handleUpdatePicture={ updateProfilePicture } />
+							<EditProfilePicture
+								handleUpdatePicture={updateProfilePicture}
+								avatar={profilePic}
+							/>
 						</Stack>
 						<Stack direction='column' px='3'>
 							{!currentUser?.displayName && (
@@ -267,11 +297,6 @@ const MyAccount: React.FC<MyAccountProps> = () => {
 							<Text fontSize='xl' fontWeight='bold'>
 								{gUser?.email}
 							</Text>
-							{currentUser?.phoneNumber && (
-								<Text fontSize='xl' fontWeight='bold'>
-									{currentUser?.phoneNumber}
-								</Text>
-							)}
 							<Button colorScheme={'purple'} onClick={logout}>
 								Log out
 							</Button>

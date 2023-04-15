@@ -15,19 +15,13 @@ import {
 	Text,
 	useDisclosure,
 	Flex,
-	Icon,
-  IconButton,
   Avatar,
 } from '@chakra-ui/react'
 import { useState } from 'react'
-import { getAuth } from 'firebase/auth'
 
-const EditProfilePicture: React.FC<any> = ({ handleUpdatePicture, user }) => {
-	const auth = getAuth()
+const EditProfilePicture: React.FC<any> = ({ handleUpdatePicture, avatar }) => {
 	const { isOpen, onOpen, onClose } = useDisclosure()
 	const [file, setFile] = useState('')
-	const [passwordChanged, setPasswordChanged] = useState(false)
-	const [error, setError] = useState('')
 
   const resetChangeForm = () => {
     setFile('')
@@ -47,24 +41,24 @@ const EditProfilePicture: React.FC<any> = ({ handleUpdatePicture, user }) => {
 	}
 
 	return (
-    <Flex>
-      <Stack direction='column' onClick={ onOpen } align={'center'}>
-        <Avatar
-          size='md'
-          name='User Avatar'
-          src='/avatar_placeholder.jpg'
-          style={{ cursor: 'pointer' }}
-        />
-        <Text
-          align={'center'}
-          as='i'
-          style={{ cursor: 'pointer' }}
-          color='blue.500'
-          w='10vh'
-        >
-          Update Profile Picture
-        </Text>
-      </Stack>
+		<Flex>
+			<Stack direction='column' align={'center'}>
+				<Avatar
+					size='md'
+					name='User Avatar'
+					src={avatar ? avatar : '/avatar_placeholder.jpg'}
+				/>
+				<Text
+					align={'center'}
+					as='i'
+					style={{ cursor: 'pointer' }}
+					color='blue.500'
+					w='10vh'
+					onClick={onOpen}
+				>
+					Update Profile Picture
+				</Text>
+			</Stack>
 			<Modal onClose={onClose} isOpen={isOpen}>
 				<ModalOverlay />
 				<form onSubmit={onSubmit}>
@@ -77,10 +71,12 @@ const EditProfilePicture: React.FC<any> = ({ handleUpdatePicture, user }) => {
 									<FormLabel mb={0}>Picture:</FormLabel>
 									<Input
 										id='email'
+										mb='2'
+										pt='1'
 										name='email'
 										type='file'
-                    onChange={onChange}
-                    accept='image/*'
+										onChange={onChange}
+										accept='image/*'
 									/>
 								</FormControl>
 							</Stack>
