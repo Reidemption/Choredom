@@ -1,15 +1,10 @@
 Reid Gubler's Underclassman Senior Project.
-Hoping to create web project where users can upload their chore list and will receive notifications when they are due. I plan to add a feature where users can upload their own chore list and have it be shared with other users.
 
-TODO:
-Pick a good Google font
-Pick a good color scheme
-Pick a good logo??
+This web app uses Nextjs and Firebase Authentication, Storage, Hosting, and Firestore Database to allow users to create an account and keep track of their chores. The chores are sorted chronologically by due date and upon completion can be shared with the user's friends. Friendships are as simple as searching for the friend's registered email and sending a friendship request. Users are able to change the status of friendships by navigating to the "My Account" page. The user is also able to change their account avatar and reset their password.
+
 
 # Frontend:
 
 https://whimsical.com/4600-project-choredom-GtwNfFcryFRKMJT8hAhvxd
 
 https://undraw.co/illustrations
-
-https://www.youtube.com/watch?v=PKwu15ldZ7k
