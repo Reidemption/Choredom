@@ -303,7 +303,7 @@ export default function VerticallyCenter() {
 							<Button
 								onClick={() => {
 									setFormError('')
-									onClose
+									onClose()
 								}}
 							>
 								Close
