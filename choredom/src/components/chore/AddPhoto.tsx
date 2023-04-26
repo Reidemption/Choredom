@@ -113,7 +113,7 @@ const AddPhotoModal: React.FC<any> = ({chore}) => {
 			<Checkbox
 				pr={'5'}
 				w='10%'
-				isChecked={chore.checked}
+				isChecked={chore.isDone}
 				onChange={() => onOpen()}
 			></Checkbox>
 			<Modal onClose={onClose} isOpen={isOpen}>
