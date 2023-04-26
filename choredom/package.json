@@ -1,6 +1,6 @@
 {
-  "name": "choredome",
-  "version": "0.1.0",
+  "name": "choredom",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
