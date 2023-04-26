@@ -1,10 +1,10 @@
 Reid Gubler's Underclassman Senior Project.
 
-This web app uses Nextjs and Firebase Authentication, Storage, Hosting, and Firestore Database to allow users to create an account and keep track of their chores. The chores are sorted chronologically by due date and upon completion can be shared with the user's friends. Friendships are as simple as searching for the friend's registered email and sending a friendship request. Users are able to change the status of friendships by navigating to the "My Account" page. The user is also able to change their account avatar and reset their password.
+This was my undergrad senior project. I made this in ~100 hours. I wanted a simple way to keep track of the chores that I might have to do throughout the day. I added friendships so I could show off everything that I had finished!
+
+This project was made using React + Nextjs. I used Firebase for my "backend", utilizing Cloud Storage, Authentication, Firestore Database, and Security Rules for both the database and cloud storage.
 
 
-# Frontend:
+https://choredom-fafe4.web.app/
 
-https://whimsical.com/4600-project-choredom-GtwNfFcryFRKMJT8hAhvxd
-
-https://undraw.co/illustrations
+![image](https://user-images.githubusercontent.com/75095757/234613309-8e27f786-a66b-4b11-935e-82c992b5e7ba.png)
